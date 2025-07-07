@@ -1,4 +1,4 @@
-# a 4x2 grid with buttons in it placed in a hbox next to a slider.
+# run pip install pyqt6
 
 from PyQt6.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLineEdit, QGridLayout, QStackedLayout
 from PyQt6.QtWidgets import QSlider
