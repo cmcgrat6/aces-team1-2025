@@ -129,8 +129,8 @@ def main():
                 continue
 
             # GUI Switches
-            commands = {"back":0, "home":0, "return":0, "radio": 1, "map":2, "nav":2, "satnav":2, "trip":3, "phone":4, "message":5, 
-                    "bluetooth":6, "seat":7, "settings":8}
+            commands = {"back":0, "home":0, "return":0, "radio": 1, "map":2, "nav":2, "satnav":2, "trip":3, "computer":3, "phone":4, "vehicle":5, 
+                    "info":5, "bluetooth":6, "seat":7, "settings":8}
             for entry in commands: 
                 if (entry == text):
                     awake = False
@@ -142,12 +142,9 @@ def main():
                 if (entry in text):
                     awake = False
                     return stations.get(entry)
-                
             
             # Unknown
             speak("Command not recognized. Please try again.")
-
-            
 
         except sr.UnknownValueError:
             print("Could not understand.")
