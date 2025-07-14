@@ -257,6 +257,18 @@ class MainWindow(QMainWindow):
         else:
             self.btToggle.setText("Bluetooth: On")
             self.visibilityLabel.setText("Visible to other devices")
+    
+    def connect_device(self, device):
+        self.activeDeviceLabel.setText(f"Connected to: {device}")
+        self.signalLabel.setText("Signal: Good")
+        self.batteryLabel.setText("Battery: 85%")
+        self.errorLabel.setText("")
+
+    def remove_device(self, device):
+        self.errorLabel.setText(f"{device} removed from paired devices.")
+        
+     def pair_new_device(self, _):
+        self.errorLabel.setText("Pairing failed: Device not found.")
 
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
