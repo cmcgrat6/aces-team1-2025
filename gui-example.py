@@ -267,7 +267,7 @@ class MainWindow(QMainWindow):
     def remove_device(self, device):
         self.errorLabel.setText(f"{device} removed from paired devices.")
         
-     def pair_new_device(self, _):
+    def pair_new_device(self, _):
         self.errorLabel.setText("Pairing failed: Device not found.")
 
     # Open Google Maps with the specified start and end destinations (temp)
