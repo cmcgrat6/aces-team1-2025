@@ -149,6 +149,39 @@ class MainWindow(QMainWindow):
         infoMenu.addWidget(carIcon, 0,1)
         
         # Create the bluetooth screen
+        bluetoothContainer = QWidget()
+        bluetoothMenu = QVBoxLayout(bluetoothContainer)
+        
+        # 1. Bluetooth Status
+        statusGroup = QVBoxLayout()
+        statusGroup.addWidget(QLabel("<b>Bluetooth Status</b>"))
+        self.btToggle = self.define_button("Bluetooth: On", 160, 40, self.toggle_bluetooth, None)
+        statusGroup.addWidget(self.btToggle)
+        self.visibilityLabel = QLabel("Visible to other devices")
+        statusGroup.addWidget(self.visibilityLabel)
+        bluetoothMenu.addLayout(statusGroup)
+        
+        # 2. Paired Devices List
+        pairedGroup = QVBoxLayout()
+        pairedGroup.addWidget(QLabel("<b>Paired Devices</b>"))
+        self.pairedDevices = ["Amy's Phone", "Car Audio", "John's Tablet"]
+        for device in self.pairedDevices:
+            deviceLayout = QHBoxLayout()
+            deviceLayout.addWidget(QLabel(device))
+            deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
+            deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
+            pairedGroup.addLayout(deviceLayout)
+        bluetoothMenu.addLayout(pairedGroup)
+        
+        # 3. Add New Device / Pair New Device
+        pairGroup = QVBoxLayout()
+        pairGroup.addWidget(QLabel("<b>Add New Device</b>"))
+        pairGroup.addWidget(QLabel("Make sure your device is discoverable"))
+        pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
+        bluetoothMenu.addLayout(pairGroup)
+        
+        
+        bluetoothMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the seat screen
 
@@ -172,7 +205,7 @@ class MainWindow(QMainWindow):
         self.stackLayout.addWidget(tripContainer)
         self.stackLayout.addWidget(phoneScroll)
         self.stackLayout.addWidget(infoContainer)
-        self.stackLayout.addWidget(homeButton)
+        self.stackLayout.addWidget(bluetoothContainer)
         self.stackLayout.addWidget(homeButton)
         self.stackLayout.addWidget(settingsContainer)
 
@@ -216,6 +249,15 @@ class MainWindow(QMainWindow):
         button.clicked.connect(lambda: method(methodArg))
         return button
     
+    # --- Bluetooth screen methods ---
+    def toggle_bluetooth(self, _):
+        if self.btToggle.text() == "Bluetooth: On":
+            self.btToggle.setText("Bluetooth: Off")
+            self.visibilityLabel.setText("Not visible to other devices")
+        else:
+            self.btToggle.setText("Bluetooth: On")
+            self.visibilityLabel.setText("Visible to other devices")
+
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
         url = f"https://www.google.com/maps/dir/{self.start.text()}/{end.text()}"
