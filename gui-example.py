@@ -6,11 +6,11 @@ from PyQt6 import QtGui, QtCore
 from PyQt6.QtCore import QRunnable, pyqtSlot, QThreadPool, Qt
 from PyQt6.QtGui import QPixmap
 
-import speech
+#aimport speech
 import sys, time, webbrowser
 from datetime import datetime
 
-# Trip computer. Updates distance traveled every second. Currently moving at 60 km/h
+# Trip computer. Updates distance traveled every second. Currently moving at 80 km/h
 class tripThread(QRunnable):
     @pyqtSlot()
     def run(self):
@@ -82,6 +82,7 @@ class MainWindow(QMainWindow):
         radioMenu = QGridLayout(radioGridContainer)
         self.radioLabel = QLabel("Now listening to:")
         self.radioLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        # Define and add radio stations
         radioButton1 = self.define_button("RTE 1", 200,60,self.change_station, "RTE 1")
         radioButton2 = self.define_button("RTE 2", 200,60,self.change_station, "RTE 2")
         radioButton3 = self.define_button("Newstalk", 200,60,self.change_station, "Newstalk")
@@ -99,20 +100,18 @@ class MainWindow(QMainWindow):
         mapContainer = QWidget()
         mapMenu = QVBoxLayout(mapContainer)
         mapMenu.addWidget(self.define_button("images/mapimage.png",450,288, self.change_screen, 2))
-        self.start = QLineEdit()
-        self.start.setStyleSheet("width: 200px; height:30px;")
         end = QLineEdit()
         end.setStyleSheet("width: 200px; height:30px;")
-        navButton = self.define_button("Submit", 200, 50, self.navigate, end)
-        mapMenu.addWidget(self.start)
+        navButton = self.define_button("Submit", 160, 40, self.navigate, end)
         mapMenu.addWidget(end)
         mapMenu.addWidget(navButton)
         mapMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
 
-        #Create the trip computer menu
+        # Create the trip computer menu
         tripContainer = QWidget()
         tripMenu = QVBoxLayout(tripContainer)
+        # Add the text labels for speed, distance and trip time. The trip thread will update these values after initialisaion
         self.tripDistanceLabel = QLabel("")
         self.speedLabel = QLabel("")
         self.timeLabel = QLabel("")
@@ -128,10 +127,12 @@ class MainWindow(QMainWindow):
         phoneContainer = QWidget()
         phoneMenu = QVBoxLayout(phoneContainer)
         phoneScroll = QScrollArea()
+        # Add contacts list and place them into scroll menu
         names = ["Amy", "Carl", "Dave work", "Home", "John", "John","Landlord", "Monica", "Morgan", "Pizza", "Tyrell"]
         for name in names:
             phoneMenu.addWidget(QLabel(name))
         phoneMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
+        # Set scroll menu rules
         phoneScroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         phoneScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         phoneScroll.setWidgetResizable(True)
@@ -140,6 +141,7 @@ class MainWindow(QMainWindow):
         # Create the vehicle information screen
         infoContainer = QWidget()
         infoMenu = QGridLayout(infoContainer)
+        # Define basic information about the car and an image of the car
         carIcon = self.define_button("images/car.png", 500,500,self.change_screen, 5)
         carIcon.setStyleSheet("background-color: rgb(250, 250, 250);")
         infoMenu.addWidget(QLabel("Doors open"),0,0)
@@ -168,8 +170,8 @@ class MainWindow(QMainWindow):
         for device in self.pairedDevices:
             deviceLayout = QHBoxLayout()
             deviceLayout.addWidget(QLabel(device))
-            deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
-            deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
+            #a deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
+            #a deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
             pairedGroup.addLayout(deviceLayout)
         bluetoothMenu.addLayout(pairedGroup)
         
@@ -177,17 +179,40 @@ class MainWindow(QMainWindow):
         pairGroup = QVBoxLayout()
         pairGroup.addWidget(QLabel("<b>Add New Device</b>"))
         pairGroup.addWidget(QLabel("Make sure your device is discoverable"))
-        pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
+        #a pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
         bluetoothMenu.addLayout(pairGroup)
         
         
         bluetoothMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the seat screen
+        seatContainer = QWidget()
+        seatMenu = QGridLayout(seatContainer)
+        seatHeight = QLabel()
+        seatHeight.setStyleSheet("border-width:0px;")
+        seatHeight.setPixmap(QPixmap("images/seat-height.png"))
+        seatDistance = QLabel()
+        seatDistance.setStyleSheet("border-width:0px;")
+        seatDistance.setPixmap(QPixmap("images/seat-distance.png"))
+        self.seatHeat = QLabel()
+        self.seatHeat.setStyleSheet("border-width:0px;")
+        self.seatHeat.setPixmap(QPixmap("images/seat-heat-off.png"))
+        self.backHeat = self.define_button("Back Heat: Off", 120, 40, self.set_seat_heat, "back")
+        self.bottomHeat = self.define_button("Bottom Heat: Off", 120, 40, self.set_seat_heat, "bottom")
+        self.backHeatToggle = False
+        self.bottomHeatToggle = False
+        seatMenu.addWidget(seatHeight,0,0)
+        seatMenu.addWidget(seatDistance,0,1)
+        seatMenu.addWidget(self.seatHeat,0,2)
+        seatMenu.addWidget(self.define_button("Back", 80, 40, self.change_screen, 0),1,0)
+        seatMenu.addWidget(self.backHeat,1,1)
+        seatMenu.addWidget(self.bottomHeat,1,2)
+        seatMenu.setAlignment(Qt.AlignmentFlag.AlignCenter)
 
         # Create the settings screen
         settingsContainer = QWidget()
         settingsMenu = QVBoxLayout(settingsContainer)
+        # Add some basic settings and attach methods
         self.radioToggle = self.define_button("Radio: On", 160, 40, self.change_station, "")
         factorySettings = self.define_button("Factory Settings", 160, 40, self.change_screen, 0)
         systemInfo = self.define_button("System Information", 160, 40, self.change_screen, 0)
@@ -199,15 +224,10 @@ class MainWindow(QMainWindow):
         settingsMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
     
         # Add the different main screens to the stack layout (main window that will change when something happens)
-        self.stackLayout.addWidget(container)
-        self.stackLayout.addWidget(radioGridContainer)
-        self.stackLayout.addWidget(mapContainer)
-        self.stackLayout.addWidget(tripContainer)
-        self.stackLayout.addWidget(phoneScroll)
-        self.stackLayout.addWidget(infoContainer)
-        self.stackLayout.addWidget(bluetoothContainer)
-        self.stackLayout.addWidget(homeButton)
-        self.stackLayout.addWidget(settingsContainer)
+        containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll, 
+                      infoContainer, bluetoothContainer, seatContainer, settingsContainer]
+        for c in containers:
+            self.stackLayout.addWidget(c)
 
         # Add the stack layout and text input to the main menu
         layout.addLayout(self.stackLayout, 0, 0)
@@ -222,8 +242,8 @@ class MainWindow(QMainWindow):
         # Create and start running the speech to text and trip computer threads 
         speechT = self.speechThread()
         tripT = tripThread()
-        self.threadPool.start(speechT)
-        self.threadPool.start(tripT)
+        #aself.threadPool.start(speechT)
+        #aself.threadPool.start(tripT)
 
     # Swap screens to specified index
     def change_screen(self, index):
@@ -258,16 +278,45 @@ class MainWindow(QMainWindow):
             self.btToggle.setText("Bluetooth: On")
             self.visibilityLabel.setText("Visible to other devices")
 
+    # Change seat heat regions
+    def set_seat_heat(self, region):
+        # Flip value for specified heat region
+        if (region == "back"):
+            if (self.backHeatToggle == True):
+                self.backHeatToggle = False
+                self.backHeat.setText("Back Heat: Off")
+            else:
+                self.backHeatToggle = True
+                self.backHeat.setText("Back Heat: On") 
+        else:
+            if (self.bottomHeatToggle == True):
+                self.bottomHeatToggle = False
+                self.bottomHeat.setText("Bottom Heat: Off")
+            else:
+                self.bottomHeatToggle = True
+                self.bottomHeat.setText("Bottom Heat: On")
+        # Change image icon according to previous settings
+        if self.backHeatToggle == False and self.bottomHeatToggle == False:
+            self.seatHeat.setPixmap(QPixmap("images/seat-heat-off.png"))
+        elif self.backHeatToggle == True and self.bottomHeatToggle == False:
+            self.seatHeat.setPixmap(QPixmap("images/seat-heat-back.png"))
+        elif self.backHeatToggle == False and self.bottomHeatToggle == True:
+            self.seatHeat.setPixmap(QPixmap("images/seat-heat-bottom.png"))
+        else:
+            self.seatHeat.setPixmap(QPixmap("images/seat-heat-all.png"))
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
-        url = f"https://www.google.com/maps/dir/{self.start.text()}/{end.text()}"
+        url = f"https://www.google.com/maps/dir/{"V14 T863"}/{end.text()}"
         webbrowser.open(url)
+
     # Thread class to run the speech recognition in the background
     class speechThread(QRunnable):
         @pyqtSlot()
         def run(self):
             while True:
                 text = speech.main()
+                # Voice commands to change screen will be denoted by an index, otherwise (for now) it changes radio station
+                # Any other methods like telegram messaging are not handled by this program, so they are not returned
                 if (type(text) is int):
                     window.change_screen(text)
                 else:
@@ -278,6 +327,3 @@ window = MainWindow()
 window.show()
 
 app.exec()
-
-
-
