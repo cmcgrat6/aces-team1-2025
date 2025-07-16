@@ -11,6 +11,8 @@ import speech
 import sys, time, webbrowser
 from datetime import datetime
 
+from phone_menu import create_phone_menu
+
 
 # Trip computer. Updates distance traveled every second. Currently moving at 60 km/h
 class tripThread(QRunnable):
@@ -167,12 +169,14 @@ class MainWindow(QMainWindow):
         settingsMenu.addWidget(copyrightButton)
         settingsMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
+        phoneMenuWidget = create_phone_menu(self.change_screen, self.define_button)
+
         # Add the different main screens to the stack layout (main window that will change when something happens)
         self.stackLayout.addWidget(container)
         self.stackLayout.addWidget(radioGridContainer)
         self.stackLayout.addWidget(mapContainer)
         self.stackLayout.addWidget(tripContainer)
-        self.stackLayout.addWidget(phoneScroll)
+        self.stackLayout.addWidget(phoneMenuWidget)
         self.stackLayout.addWidget(infoContainer)
         self.stackLayout.addWidget(homeButton)
         self.stackLayout.addWidget(homeButton)
