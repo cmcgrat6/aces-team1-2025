@@ -15,7 +15,7 @@ from phone_menu import create_phone_menu
 
 
 # Trip computer. Updates distance traveled every second. Currently moving at 60 km/h
-class tripThread(QRunnable):
+class TripThread(QRunnable):
     @pyqtSlot()
     def run(self):
         tripDistance = 0
@@ -193,8 +193,8 @@ class MainWindow(QMainWindow):
         self.setFixedWidth(900)
 
         # Create and start running the speech to text and trip computer threads
-        speechT = self.speechThread()
-        tripT = tripThread()
+        speechT = self.SpeechThread()
+        tripT = TripThread()
         self.threadPool.start(speechT)
         self.threadPool.start(tripT)
 
@@ -205,7 +205,7 @@ class MainWindow(QMainWindow):
     # Change radio stations
     def change_station(self, station):
         self.radioLabel.setText("Now listening to: " + station)
-        if (self.radioToggle.text() == "Radio: On"):
+        if self.radioToggle.text() == "Radio: On":
             self.radioToggle.setText("Radio: Off")
         else:
             self.radioToggle.setText("Radio: On")
@@ -228,12 +228,12 @@ class MainWindow(QMainWindow):
         webbrowser.open(url)
 
     # Thread class to run the speech recognition in the background
-    class speechThread(QRunnable):
+    class SpeechThread(QRunnable):
         @pyqtSlot()
         def run(self):
             while True:
                 text = speech.main()
-                if (type(text) is int):
+                if type(text) is int:
                     window.change_screen(text)
                 else:
                     window.change_station(text)
