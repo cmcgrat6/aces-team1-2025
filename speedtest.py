@@ -44,7 +44,7 @@ class SpeedControl(QWidget):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Speed Control")
-        self.setFixedSize(400, 250)
+        self.setFixedSize(400, 150)
 
         # Label to show the current speed
         self.label = QLabel("Speed: 0 km/h", self)

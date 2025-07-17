@@ -9,7 +9,7 @@ from PyQt6.QtWidgets import (
 )
 from PyQt6.QtCore import (
     pyqtSignal,                 
-    QThread,                  
+    QThread,            
     Qt                          
 )
 
@@ -24,7 +24,6 @@ class ListenerThread(QThread):
     """
     # Define a signal carrying an integer (the new speed)
     speed_received = pyqtSignal(int)
-
     def run(self):
         """
         Thread entry point.
