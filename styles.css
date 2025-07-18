@@ -5,16 +5,18 @@ QWidget {
 
 QPushButton {
     font-size: 16px;
-    background-color: rgb(240, 240, 240);
-    color:black;
+    background-color: rgb(255, 255, 255);
+    color:rgb(0, 0, 0);
     border-style:inset;
-    border-width:2px;
+    border-width:1px;
     border-color:black;
 }
 
 QLabel {
+    background-color: rgb(255, 255, 255);
+    color:rgb(0, 0, 0);
     font-size: 28px;
     border-style:inset;
-    border-width:2px;
+    border-width:1px;
     border-color:black;
 }
