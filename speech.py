@@ -129,20 +129,20 @@ def main():
                 continue
 
             # GUI Switches
-            commands = {"back":0, "home":0, "return":0, "radio": 1, "map":2, "nav":2, "satnav":2, "trip":3, "computer":3, "phone":4, "vehicle":5, 
-                    "info":5, "bluetooth":6, "seat":7, "settings":8}
-            for entry in commands: 
+            commands = {"back":0, "home":0, "return":0, "radio": 1, "map":2, "nav":2, "satnav":2, "trip":3, "computer":3, "phone":4, "vehicle":5,
+                        "info":5, "bluetooth":6, "seat":7, "settings":8}
+            for entry in commands:
                 if (entry == text):
                     awake = False
                     return commands.get(entry)
-                
+
             # Radio Stations
             stations = {"rte one": "RTE 1", "rte two": "RTE 2", "newstalk": "NEWSTALK", "spin": "SPIN SW"}
             for entry in stations:
                 if (entry in text):
                     awake = False
                     return stations.get(entry)
-            
+
             # Unknown
             speak("Command not recognized. Please try again.")
 
