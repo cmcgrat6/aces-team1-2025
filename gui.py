@@ -11,6 +11,15 @@ from screendimmer import ListenerThread
 import sys, time, webbrowser
 from datetime import datetime
 
+import speech_recognition as sr
+import pyttsx3
+import os
+import screen_brightness_control as sbc
+from ctypes import cast, POINTER
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+import re
+
 class MainWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -391,18 +400,138 @@ class MainWindow(QMainWindow):
         url = f"https://www.google.com/maps/dir/{"V14 T863"}/{end.text()}"
         webbrowser.open(url)
 
-    # Thread class to run the speech recognition in the background
-    class speechThread(QRunnable):
-        @pyqtSlot()
-        def run(self):
-            while True:
-                text = speech.main()
-                # Voice commands to change screen will be denoted by an index, otherwise (for now) it changes radio station
-                # Any other methods like telegram messaging are not handled by this program, so they are not returned
-                if (type(text) is int):
-                    window.change_screen(text)
-                else:
-                    window.change_station(text)
+# Thread class to run the speech recognition in the background
+class speechThread(QRunnable):
+    @pyqtSlot()
+    def run(self):
+        recognizer = sr.Recognizer()
+        mic = sr.Microphone()
+        engine = pyttsx3.init()
+
+        def speak(text):
+            print("Assistant:", text)
+            engine.say(text)
+            engine.runAndWait()
+
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
+
+        def set_volume(value):
+            value = max(0, min(100, value))
+            volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
+
+        def listen():
+            with mic as source:
+                recognizer.adjust_for_ambient_noise(source)
+                audio = recognizer.listen(source)
+            return recognizer.recognize_google(audio).lower()
+
+        awake = False
+        print("Say 'Hi Jaguar' to activate.")
+
+        while True:
+            try:
+                print("Listening...")
+                text = listen()
+                print("You said:", text)
+
+                if not awake:
+                    if "hi jaguar" in text:
+                        awake = True
+                        speak("Yes?")
+                    continue
+
+                if "go to sleep" in text:
+                    speak("Going to sleep.")
+                    awake = False
+                    continue
+                    
+                # screen navigation by voice
+                elif "open radio" in text or "go to radio" in text:
+                    window.change_screen(1)
+                    speak("Opening Radio.")
+                elif "open maps" in text or "go to maps" in text:
+                    window.change_screen(2)
+                    speak("Opening Navigation.")
+                elif "open trip computer" in text or "go to trip" in text:
+                    window.change_screen(3)
+                    speak("Opening Trip Computer.")
+                elif "open phone" in text or "go to phone" in text:
+                    window.change_screen(4)
+                    speak("Opening Phone.")
+                elif "open vehicle" in text or "go to vehicle" in text or "vehicle info" in text:
+                    window.change_screen(5)
+                    speak("Opening Vehicle Info.")
+                elif "open bluetooth" in text or "go to bluetooth" in text:
+                    window.change_screen(6)
+                    speak("Opening Bluetooth.")
+                elif "open messages" in text or "go to messages" in text:
+                    window.change_screen(7)
+                    speak("Opening Messages.")
+                elif "open settings" in text or "go to settings" in text:
+                    window.change_screen(8)
+                    speak("Opening Settings.")
+
+                if "volume" in text:
+                    current = volume_interface.GetMasterVolumeLevelScalar() * 100
+                    if "increase" in text:
+                        set_volume(int(current + 10))
+                        speak("Volume increased.")
+                    elif "decrease" in text:
+                        set_volume(int(current - 10))
+                        speak("Volume decreased.")
+                    elif "set" in text:
+                        match = re.search(r"(\d+)", text)
+                        if match:
+                            set_volume(int(match.group(1)))
+                            speak("Volume set.")
+                    awake = False
+                    continue
+
+                if "brightness" in text:
+                    if "increase" in text:
+                        sbc.set_brightness("+=10")
+                        speak("Brightness increased.")
+                    elif "decrease" in text:
+                        sbc.set_brightness("-=10")
+                        speak("Brightness decreased.")
+                    elif "set" in text:
+                        match = re.search(r"(\d+)", text)
+                        if match:
+                            sbc.set_brightness(int(match.group(1)))
+                            speak("Brightness set.")
+                    awake = False
+                    continue
+
+                if "open maps" in text or "navigate" in text:
+                    speak("Starting point?")
+                    start = listen()
+                    speak("Destination?")
+                    end = listen()
+                    url = f"https://www.google.com/maps/dir/{start}/{end}"
+                    webbrowser.open(url)
+                    speak("Opened Google Maps.")
+                    awake = False
+                    continue
+
+                if "send message" in text or "telegram" in text:
+                    speak("What should I send?")
+                    message = listen()
+                    print(f"[Mock] Would send this message via Telegram: {message}")
+                    speak("Message saved for Telegram demo.")
+                    with open("demo_mock_messages.txt", "a") as f:
+                        f.write(f"{message}\n")
+                    awake = False
+                    continue
+
+                speak("Command not recognized.")
+                awake = False
+
+            except sr.UnknownValueError:
+                print("Could not understand.")
+            except Exception as e:
+                print("Error:", e)
 
     # Trip computer. Updates distance traveled every second.
     class tripThread(QRunnable):
