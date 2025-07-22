@@ -1,5 +1,5 @@
 # run pip install pyqt6 SpeechRecognition pyttsx3 PyAudio pycaw screen-brightness-control
-# press any button to go to its specific screen 
+# press any button to go to its specific screen
 
 from PyQt6.QtWidgets import QApplication, QScrollArea, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLineEdit, QGridLayout, QStackedLayout
 from PyQt6 import QtGui, QtCore
@@ -28,8 +28,8 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(file.read())
 
         self.setWindowTitle("Speed Sensitive Screen")
-    
-        # Define each different layout 
+
+        # Define each different layout
         container = QWidget()
         layout = QGridLayout()
         homeScreenLayout = QGridLayout(container)
@@ -39,7 +39,7 @@ class MainWindow(QMainWindow):
         self.buttons = []
         # Create labels list so we can dim them all at once later
         self.labels = []
-        
+
         # Add the home screen buttons to the home screen with grid coordinates
         homeScreenLayout.addWidget(self.define_button("images/radio.png", 200,200,self.change_screen, 1), 0, 0)
         homeScreenLayout.addWidget(self.define_button("images/maps.png",200,200,self.change_screen,2), 0, 1)
@@ -111,7 +111,7 @@ class MainWindow(QMainWindow):
         phoneMenu = QVBoxLayout(phoneContainer)
         phoneScroll = QScrollArea()
         # Add contacts list and place them into scroll menu
-        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan", 
+        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan",
                          "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
         for name in self.contacts:
             phoneMenu.addWidget(self.define_label(name))
@@ -137,11 +137,11 @@ class MainWindow(QMainWindow):
         carImage.setPixmap(QPixmap("images/car.png"))
         infoMenu.addWidget(infoSidebarContainer,0,0)
         infoMenu.addWidget(carImage, 0,1)
-        
+
         # Create the bluetooth screen
         bluetoothContainer = QWidget()
         bluetoothMenu = QVBoxLayout(bluetoothContainer)
-        
+
         # 1. Bluetooth Status
         statusGroup = QVBoxLayout()
         statusGroup.addWidget(self.define_label("<b>Bluetooth Status</b>"))
@@ -150,7 +150,7 @@ class MainWindow(QMainWindow):
         self.visibilityLabel = self.define_label("Visible to other devices")
         statusGroup.addWidget(self.visibilityLabel)
         bluetoothMenu.addLayout(statusGroup)
-        
+
         # 2. Paired Devices List
         pairedGroup = QVBoxLayout()
         pairedGroup.addWidget(self.define_label("<b>Paired Devices</b>"))
@@ -162,7 +162,7 @@ class MainWindow(QMainWindow):
             deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
             pairedGroup.addLayout(deviceLayout)
         bluetoothMenu.addLayout(pairedGroup)
-        
+
         # 3. Add New Device / Pair New Device
         pairGroup = QVBoxLayout()
         pairGroup.addWidget(self.define_label("<b>Add New Device</b>"))
@@ -240,10 +240,10 @@ class MainWindow(QMainWindow):
         copyrightText.setAlignment(Qt.AlignmentFlag.AlignCenter)
         copyrightScreen.addWidget(copyrightText)
         copyrightScreen.addWidget(self.define_button("Back", 160, 40, self.change_screen, 8))
-    
+
         # Add the different main screens to the stack layout (main window that will change when something happens)
-        self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll, 
-                      infoContainer, bluetoothContainer, messageContainer, settingsContainer, self.textsContainer, 
+        self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll,
+                      infoContainer, bluetoothContainer, messageContainer, settingsContainer, self.textsContainer,
                       languageContainer, informationContainer, copyrightContainer]
         for c in self.containers:
             self.stackLayout.addWidget(c)
@@ -260,7 +260,7 @@ class MainWindow(QMainWindow):
 
         # Define thread pool to run background threads
         self.threadPool = QThreadPool()
-        # Create and start running the speech to text and trip computer threads 
+        # Create and start running the speech to text and trip computer threads
         speechT = self.speechThread()
         self.tripT = self.tripThread()
         # Instantiate the listener thread and connect its signal
@@ -319,7 +319,7 @@ class MainWindow(QMainWindow):
             )
         for label in self.labels:
             label.setStyleSheet(
-                f"background-color: rgba(255, 255, 255, {alpha});" 
+                f"background-color: rgba(255, 255, 255, {alpha});"
             )
 
     # Get messages from the messages file for the specific contact and display them
@@ -335,15 +335,15 @@ class MainWindow(QMainWindow):
                 messagesExist = True
                 widget = self.define_label(line)
                 widget.setMinimumHeight(60)
-                if "From" in line[length:length+5]: 
+                if "From" in line[length:length+5]:
                     widget.setAlignment(Qt.AlignmentFlag.AlignLeft)
                     widget.setText(line[length + 6:])
-                else: 
+                else:
                     widget.setAlignment(Qt.AlignmentFlag.AlignRight)
                     widget.setText(line[length + 4:])
                 self.messageWidgets.append(widget)
                 self.textsMenu.addWidget(widget)
-        if (not messagesExist): 
+        if (not messagesExist):
             widget = self.define_label("No messages available.")
             widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
             self.messageWidgets.append(widget)
@@ -353,10 +353,10 @@ class MainWindow(QMainWindow):
         self.messageWidgets.append(backButton)
         self.change_screen(9)
 
-    # Create a button with an icon or text field, width, height and connect it to a method 
+    # Create a button with an icon or text field, width, height and connect it to a method
     def define_button(self, iconOrText, w, h, method, methodArg):
         button = QPushButton()
-        if ".png" in iconOrText: 
+        if ".png" in iconOrText:
             button.setIcon(QtGui.QIcon(iconOrText))
             button.setIconSize(QtCore.QSize(w,h))
         else:
@@ -366,7 +366,7 @@ class MainWindow(QMainWindow):
         self.buttons.append(button)
         button.setStyleSheet("background-color: rgb(255, 255, 255);")
         return button
-    
+
     # Create a label with a text field. Exists because dimming the screen without redefining background colour for each label will dim them until they are unreadable
     def define_label(self, text):
         label = QLabel(text)
@@ -391,147 +391,223 @@ class MainWindow(QMainWindow):
 
     def remove_device(self, device):
         self.errorLabel.setText(f"{device} removed from paired devices.")
-        
+
     def pair_new_device(self, _):
         self.errorLabel.setText("Pairing failed: Device not found.")
 
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
-        url = f"https://www.google.com/maps/dir/{"V14 T863"}/{end.text()}"
+        url = f"https://www.google.com/maps/dir/V14 T863/{end.text()}"
         webbrowser.open(url)
 
-# Thread class to run the speech recognition in the background
-class speechThread(QRunnable):
-    @pyqtSlot()
-    def run(self):
-        recognizer = sr.Recognizer()
-        mic = sr.Microphone()
-        engine = pyttsx3.init()
+    def handle_voice_command(text, window, volume_interface):
+        text = text.lower()
 
-        def speak(text):
-            print("Assistant:", text)
-            engine.say(text)
-            engine.runAndWait()
+        # --- scrolling ---
+        if "scroll down phone" in text:
+            window.phoneScroll.verticalScrollBar().setValue(
+                window.phoneScroll.verticalScrollBar().value() + 100
+            )
+            return "Scrolling down the phone list."
 
-        devices = AudioUtilities.GetSpeakers()
-        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-        volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
+        elif "scroll up phone" in text:
+            window.phoneScroll.verticalScrollBar().setValue(
+                window.phoneScroll.verticalScrollBar().value() - 100
+            )
+            return "Scrolling up the phone list."
 
-        def set_volume(value):
-            value = max(0, min(100, value))
-            volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
+        elif "scroll down messages" in text:
+            window.messagesScroll.verticalScrollBar().setValue(
+                window.messagesScroll.verticalScrollBar().value() + 100
+            )
+            return "Scrolling down your messages."
 
-        def listen():
-            with mic as source:
-                recognizer.adjust_for_ambient_noise(source)
-                audio = recognizer.listen(source)
-            return recognizer.recognize_google(audio).lower()
+        elif "scroll up messages" in text:
+            window.messagesScroll.verticalScrollBar().setValue(
+                window.messagesScroll.verticalScrollBar().value() - 100
+            )
+            return "Scrolling up your messages."
 
-        awake = False
-        print("Say 'Hi Jaguar' to activate.")
+        # --- radio stations ---
+        elif "switch to rte 1" in text:
+            window.change_screen(1)
+            window.change_station("RTE 1")
+            return "Now playing RTE 1."
 
-        while True:
-            try:
-                print("Listening...")
-                text = listen()
-                print("You said:", text)
+        elif "switch to rte 2" in text:
+            window.change_screen(1)
+            window.change_station("RTE 2")
+            return "Now playing RTE 2."
 
-                if not awake:
-                    if "hi jaguar" in text:
-                        awake = True
-                        speak("Yes?")
-                    continue
+        elif "switch to newstalk" in text:
+            window.change_screen(1)
+            window.change_station("Newstalk")
+            return "Tuned to Newstalk."
 
-                if "go to sleep" in text:
-                    speak("Going to sleep.")
+        elif "switch to spin southwest" in text or "switch to spin sw" in text:
+            window.change_screen(1)
+            window.change_station("SPIN SW")
+            return "Listening to SPIN Southwest."
+
+        # --- bluetooth toggle ---
+        elif "turn bluetooth off" in text:
+            if window.btToggle.text() != "Bluetooth: Off":
+                window.change_screen(6)
+                window.toggle_bluetooth(None)
+            return "Bluetooth turned off."
+
+        elif "turn bluetooth on" in text:
+            if window.btToggle.text() != "Bluetooth: On":
+                window.change_screen(6)
+                window.toggle_bluetooth(None)
+            return "Bluetooth turned on."
+
+        # --- radio toggle in settings ---
+        elif "turn radio off" in text:
+            if window.radioToggle.text() != "Radio: Off":
+                window.change_screen(8)
+                window.change_station("")
+            return "Radio turned off."
+
+        elif "turn radio on" in text:
+            if window.radioToggle.text() != "Radio: On":
+                window.change_screen(8)
+                window.change_station("")
+            return "Radio turned on."
+
+        # --- volume ---
+        elif "increase volume" in text:
+            current = volume_interface.GetMasterVolumeLevelScalar() * 100
+            window.set_volume(int(current + 10))
+            return "Volume increased."
+
+        elif "decrease volume" in text:
+            current = volume_interface.GetMasterVolumeLevelScalar() * 100
+            window.set_volume(int(current - 10))
+            return "Volume decreased."
+
+        elif "set volume to" in text:
+            match = re.search(r"(\d+)", text)
+            if match:
+                window.set_volume(int(match.group(1)))
+                return f"Volume set to {match.group(1)}."
+
+        # --- brightness ---
+        elif "increase brightness" in text:
+            sbc.set_brightness("+=10")
+            return "Brightness increased."
+
+        elif "decrease brightness" in text:
+            sbc.set_brightness("-=10")
+            return "Brightness decreased."
+
+        elif "set brightness to" in text:
+            match = re.search(r"(\d+)", text)
+            if match:
+                sbc.set_brightness(int(match.group(1)))
+                return f"Brightness set to {match.group(1)} percent."
+
+        return None
+
+    # Thread class to run the speech recognition in the background
+    class speechThread(QRunnable):
+        @pyqtSlot()
+        def run(self):
+            recognizer = sr.Recognizer()
+            mic = sr.Microphone()
+            engine = pyttsx3.init()
+
+            def speak(text):
+                print("Assistant:", text)
+                engine.say(text)
+                engine.runAndWait()
+
+            devices = AudioUtilities.GetSpeakers()
+            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+            volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
+
+            def set_volume(value):
+                value = max(0, min(100, value))
+                volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
+                window.set_volume = set_volume  # Make it accessible from helper
+
+            def listen():
+                with mic as source:
+                    recognizer.adjust_for_ambient_noise(source)
+                    audio = recognizer.listen(source)
+                return recognizer.recognize_google(audio).lower()
+
+            awake = False
+            print("Say 'Hi Jaguar' to activate.")
+
+            while True:
+                try:
+                    print("Listening...")
+                    text = listen()
+                    print("You said:", text)
+
+                    if not awake:
+                        if "hi jaguar" in text:
+                            awake = True
+                            speak("Yes?")
+                        continue
+
+                    if "go to sleep" in text:
+                        speak("Going to sleep.")
+                        awake = False
+                        continue
+
+                    # screen switching & maps logic
+                    if "open maps" in text or "go to maps" in text:
+                        window.change_screen(2)
+                        speak("Opening Navigation.")
+                        speak("Starting point?")
+                        start = listen()
+                        speak("Destination?")
+                        end = listen()
+                        url = f"https://www.google.com/maps/dir/{start}/{end}"
+                        webbrowser.open(url)
+                        speak("Opened Google Maps.")
+                        awake = False
+                        continue
+
+                    elif "open radio" in text:
+                        window.change_screen(1)
+                        speak("Opening Radio.")
+                    elif "open phone" in text:
+                        window.change_screen(4)
+                        speak("Opening Phone.")
+                    elif "open messages" in text:
+                        window.change_screen(7)
+                        speak("Opening Messages.")
+                    elif "open bluetooth" in text:
+                        window.change_screen(6)
+                        speak("Opening Bluetooth.")
+                    elif "open settings" in text:
+                        window.change_screen(8)
+                        speak("Opening Settings.")
+                    elif "open trip computer" in text:
+                        window.change_screen(3)
+                        speak("Opening Trip Computer.")
+                    elif "open vehicle" in text:
+                        window.change_screen(5)
+                        speak("Opening Vehicle Info.")
+
+                    # run voice command handler
+                    response = handle_voice_command(text, window, volume_interface)
+                    if response:
+                        speak(response)
+                        awake = False
+                        continue
+
+                    speak("Command not recognized.")
                     awake = False
-                    continue
-                    
-                # screen navigation by voice
-                elif "open radio" in text or "go to radio" in text:
-                    window.change_screen(1)
-                    speak("Opening Radio.")
-                elif "open maps" in text or "go to maps" in text:
-                    window.change_screen(2)
-                    speak("Opening Navigation.")
-                elif "open trip computer" in text or "go to trip" in text:
-                    window.change_screen(3)
-                    speak("Opening Trip Computer.")
-                elif "open phone" in text or "go to phone" in text:
-                    window.change_screen(4)
-                    speak("Opening Phone.")
-                elif "open vehicle" in text or "go to vehicle" in text or "vehicle info" in text:
-                    window.change_screen(5)
-                    speak("Opening Vehicle Info.")
-                elif "open bluetooth" in text or "go to bluetooth" in text:
-                    window.change_screen(6)
-                    speak("Opening Bluetooth.")
-                elif "open messages" in text or "go to messages" in text:
-                    window.change_screen(7)
-                    speak("Opening Messages.")
-                elif "open settings" in text or "go to settings" in text:
-                    window.change_screen(8)
-                    speak("Opening Settings.")
 
-                if "volume" in text:
-                    current = volume_interface.GetMasterVolumeLevelScalar() * 100
-                    if "increase" in text:
-                        set_volume(int(current + 10))
-                        speak("Volume increased.")
-                    elif "decrease" in text:
-                        set_volume(int(current - 10))
-                        speak("Volume decreased.")
-                    elif "set" in text:
-                        match = re.search(r"(\d+)", text)
-                        if match:
-                            set_volume(int(match.group(1)))
-                            speak("Volume set.")
-                    awake = False
-                    continue
+                except sr.UnknownValueError:
+                    print("Could not understand.")
+                except Exception as e:
+                    print("Error:", e)
 
-                if "brightness" in text:
-                    if "increase" in text:
-                        sbc.set_brightness("+=10")
-                        speak("Brightness increased.")
-                    elif "decrease" in text:
-                        sbc.set_brightness("-=10")
-                        speak("Brightness decreased.")
-                    elif "set" in text:
-                        match = re.search(r"(\d+)", text)
-                        if match:
-                            sbc.set_brightness(int(match.group(1)))
-                            speak("Brightness set.")
-                    awake = False
-                    continue
-
-                if "open maps" in text or "navigate" in text:
-                    speak("Starting point?")
-                    start = listen()
-                    speak("Destination?")
-                    end = listen()
-                    url = f"https://www.google.com/maps/dir/{start}/{end}"
-                    webbrowser.open(url)
-                    speak("Opened Google Maps.")
-                    awake = False
-                    continue
-
-                if "send message" in text or "telegram" in text:
-                    speak("What should I send?")
-                    message = listen()
-                    print(f"[Mock] Would send this message via Telegram: {message}")
-                    speak("Message saved for Telegram demo.")
-                    with open("demo_mock_messages.txt", "a") as f:
-                        f.write(f"{message}\n")
-                    awake = False
-                    continue
-
-                speak("Command not recognized.")
-                awake = False
-
-            except sr.UnknownValueError:
-                print("Could not understand.")
-            except Exception as e:
-                print("Error:", e)
 
     # Trip computer. Updates distance traveled every second.
     class tripThread(QRunnable):
