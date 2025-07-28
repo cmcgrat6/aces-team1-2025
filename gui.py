@@ -6,7 +6,7 @@ from PyQt6 import QtGui, QtCore
 from PyQt6.QtCore import QRunnable, pyqtSlot, QThreadPool, Qt
 from PyQt6.QtGui import QPixmap
 
-#aimport speech
+import speech
 from screendimmer import ListenerThread
 import sys, time, webbrowser
 from datetime import datetime
@@ -18,7 +18,7 @@ class MainWindow(QMainWindow):
         with open("styles.css", "r") as file:
             self.setStyleSheet(file.read())
 
-        self.setWindowTitle("Really early version")
+        self.setWindowTitle("Speed Sensitive Screen")
     
         # Define each different layout 
         container = QWidget()
@@ -26,34 +26,24 @@ class MainWindow(QMainWindow):
         homeScreenLayout = QGridLayout(container)
         self.stackLayout = QStackedLayout()
 
-        # Create button list so we can enable / disable all of them at once later
+        # Create button, label and scrollArea list so we can enable / disable all of them at once later
         self.buttons = []
         # Create labels list so we can dim them all at once later
         self.labels = []
-
-        # Define each button for the home screen
-        button1 = self.define_button("images/radio.png", 200,200,self.change_screen, 1)
-        button2 = self.define_button("images/maps.png",200,200,self.change_screen,2)
-        button3 = self.define_button("images/tripcomputer.png",200,200,self.change_screen,3)
-        button4 = self.define_button("images/phone.png",200,200,self.change_screen,4)
-        button5 = self.define_button("images/vehicleinfo.png",200,200,self.change_screen,5)
-        button6 = self.define_button("images/bluetooth.png",200,200,self.change_screen,6)
-        button7 = self.define_button("images/messages.png",200,200,self.change_screen,7)
-        button8 = self.define_button("images/settings.png",200,200,self.change_screen,8)
-
+        
         # Add the home screen buttons to the home screen with grid coordinates
-        homeScreenLayout.addWidget(button1, 0, 0)
-        homeScreenLayout.addWidget(button2, 0, 1)
-        homeScreenLayout.addWidget(button3, 0, 2)
-        homeScreenLayout.addWidget(button4, 0, 3)
+        homeScreenLayout.addWidget(self.define_button("images/radio.png", 200,200,self.change_screen, 1), 0, 0)
+        homeScreenLayout.addWidget(self.define_button("images/maps.png",200,200,self.change_screen,2), 0, 1)
+        homeScreenLayout.addWidget(self.define_button("images/tripcomputer.png",200,200,self.change_screen,3), 0, 2)
+        homeScreenLayout.addWidget(self.define_button("images/phone.png",200,200,self.change_screen,4), 0, 3)
         homeScreenLayout.addWidget(self.define_label("Radio"),1,0)
         homeScreenLayout.addWidget(self.define_label("Navigation"),1,1)
         homeScreenLayout.addWidget(self.define_label("Trip Computer"),1,2)
         homeScreenLayout.addWidget(self.define_label("Phone"),1,3)
-        homeScreenLayout.addWidget(button5, 2, 0)
-        homeScreenLayout.addWidget(button6, 2, 1)
-        homeScreenLayout.addWidget(button7, 2, 2)
-        homeScreenLayout.addWidget(button8, 2, 3)
+        homeScreenLayout.addWidget(self.define_button("images/vehicleinfo.png",200,200,self.change_screen,5), 2, 0)
+        homeScreenLayout.addWidget(self.define_button("images/bluetooth.png",200,200,self.change_screen,6), 2, 1)
+        homeScreenLayout.addWidget(self.define_button("images/messages.png",200,200,self.change_screen,7), 2, 2)
+        homeScreenLayout.addWidget(self.define_button("images/settings.png",200,200,self.change_screen,8), 2, 3)
         homeScreenLayout.addWidget(self.define_label("Vehicle"),3,0)
         homeScreenLayout.addWidget(self.define_label("Bluetooth"),3,1)
         homeScreenLayout.addWidget(self.define_label("Messages"),3,2)
@@ -64,17 +54,13 @@ class MainWindow(QMainWindow):
         radioGridContainer = QWidget()
         radioList = QHBoxLayout(radioContainer)
         radioMenu = QGridLayout(radioGridContainer)
-        self.radioLabel = self.define_label("Now listening to:")
+        self.radioLabel = self.define_label("Radio Off")
         self.radioLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         # Define and add radio stations
-        radioButton1 = self.define_button("RTE 1", 200,60,self.change_station, "RTE 1")
-        radioButton2 = self.define_button("RTE 2", 200,60,self.change_station, "RTE 2")
-        radioButton3 = self.define_button("Newstalk", 200,60,self.change_station, "Newstalk")
-        radioButton4 = self.define_button("SPIN SW", 200,60,self.change_station, "SPIN SW")
-        radioList.addWidget(radioButton1)
-        radioList.addWidget(radioButton2)
-        radioList.addWidget(radioButton3)
-        radioList.addWidget(radioButton4)
+        radioList.addWidget(self.define_button("RTE 1", 200,60,self.change_station, "Now listening to: RTE 1"))
+        radioList.addWidget(self.define_button("RTE 2", 200,60,self.change_station, "Now listening to: RTE 2"))
+        radioList.addWidget(self.define_button("Newstalk", 200,60,self.change_station, "Now listening to: Newstalk"))
+        radioList.addWidget(self.define_button("SPIN SW", 200,60,self.change_station, "Now listening to: SPIN SW"))
         radioMenu.addWidget(self.radioLabel)
         radioMenu.addWidget(radioContainer)
         radioMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
@@ -100,7 +86,7 @@ class MainWindow(QMainWindow):
         self.tripDistanceLabel = self.define_label("")
         self.speedLabel = self.define_label("")
         self.timeLabel = self.define_label("")
-        self.rangeLabel = self.define_label(")")
+        self.rangeLabel = self.define_label("")
         self.tripDistanceLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.speedLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         self.timeLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
@@ -163,8 +149,8 @@ class MainWindow(QMainWindow):
         for device in self.pairedDevices:
             deviceLayout = QHBoxLayout()
             deviceLayout.addWidget(self.define_label(device))
-            #a deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
-            #a deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
+            deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
+            deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
             pairedGroup.addLayout(deviceLayout)
         bluetoothMenu.addLayout(pairedGroup)
         
@@ -172,43 +158,84 @@ class MainWindow(QMainWindow):
         pairGroup = QVBoxLayout()
         pairGroup.addWidget(self.define_label("<b>Add New Device</b>"))
         pairGroup.addWidget(self.define_label("Make sure your device is discoverable"))
-        #a pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
+        pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
         bluetoothMenu.addLayout(pairGroup)
         bluetoothMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the messages screen
-        messagesContainer = QWidget()
-        messagesMenu = QVBoxLayout(messagesContainer)
-        messagesScroll = QScrollArea()
+        # Create the widgets and layouts needed for the screen
+        messageContainer = QWidget()
+        messageLayout = QVBoxLayout(messageContainer)
+        messageMenuContainer = QWidget()
+        messagesMenu = QVBoxLayout(messageMenuContainer)
+        messageScrollContainer = QWidget()
+        messagesScroll = QScrollArea(messageScrollContainer)
+        # Add all of the contacts to the scroll area
         for name in self.contacts:
-            messagesMenu.addWidget(self.define_button(name, 300, 40, self.change_screen, 0))
-        messagesMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
+            messagesMenu.addWidget(self.define_button(name, 800, 50, self.open_messages, name))
+        # Set the scroll area rules and add each widget to the correct place
+        messagesScroll.setMinimumSize(850,500)
         messagesScroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
         messagesScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
         messagesScroll.setWidgetResizable(True)
-        messagesScroll.setWidget(messagesContainer)
+        messagesScroll.setWidget(messageMenuContainer)
+        messageLayout.addWidget(messageScrollContainer)
+        messageLayout.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
         # Create a texts container with associated widgets to be used later by open_messages
         self.textsContainer = QWidget()
         self.textsMenu = QVBoxLayout(self.textsContainer)
-        self.message = QLabel("")
+        self.message = self.define_label("")
+        self.messageWidgets = []
 
         # Create the settings screen
         settingsContainer = QWidget()
         settingsMenu = QVBoxLayout(settingsContainer)
         # Add some basic settings and attach methods
-        self.radioToggle = self.define_button("Radio: On", 160, 40, self.change_station, "")
-        factorySettings = self.define_button("Factory Settings", 160, 40, self.change_screen, 0)
-        systemInfo = self.define_button("System Information", 160, 40, self.change_screen, 0)
-        copyrightButton = self.define_button("Copyright", 160, 40, self.change_screen, 0)
+        self.radioToggle = self.define_button("Radio: On", 160, 40, self.change_station, "Radio Off")
+        factorySettings = self.define_button("Language", 160, 40, self.change_screen, 10)
+        systemInfo = self.define_button("System Information", 160, 40, self.change_screen, 11)
+        copyrightButton = self.define_button("Copyright", 160, 40, self.change_screen, 12)
         settingsMenu.addWidget(self.radioToggle)
         settingsMenu.addWidget(factorySettings)
         settingsMenu.addWidget(systemInfo)
         settingsMenu.addWidget(copyrightButton)
         settingsMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
+
+        # Create the languages screen
+        languageContainer = QWidget()
+        langaugeVBox = QVBoxLayout(languageContainer)
+        for name in ["English (UK)","English (US)","English (Ireland)"]:
+            newLayout = QHBoxLayout()
+            newLayout.addWidget(self.define_button(name,300,150,self.change_screen,8))
+            newLayout.addWidget(self.define_button("images/"+name+".png",300,150,self.change_screen,8))
+            langaugeVBox.addLayout(newLayout)
+        langaugeVBox.addWidget(self.define_button("Back", 160, 40, self.change_screen, 8))
+
+        # Create the information menu
+        informationContainer = QWidget()
+        informationMenu = QVBoxLayout(informationContainer)
+        informationText = self.define_label("How to use:\nAfter running this program, run speedtest.py.\nInteract with this menu" \
+        ", ideally with the touchscreen.\nYou may also say 'Hey Jaguar' to use the voice control system.\nUse the slider included in speedtest.py" \
+        "to adjust the simulated speed.\nFor safety, the GUI will not be interactable past 60km/h." \
+        "\nUse the voice control system past this point.")
+        informationMenu.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        informationMenu.addWidget(informationText)
+        informationMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 8))
+
+        # Create the copyright menu with credits
+        copyrightContainer = QWidget()
+        copyrightScreen = QVBoxLayout(copyrightContainer)
+        copyrightText = self.define_label("By Conor McGrath, Nasrin Shamaeian, Jie Song Tan, \nShaun Purcell and Shane Easo." \
+        "\nCreated for the JLR Shannon Undergraduates ACES Challenge 2025. \nSpecial thanks to John Lawless and Lee Skrypchuk " \
+        "\nfor their guidance on the project's direction.")
+        copyrightText.setAlignment(Qt.AlignmentFlag.AlignCenter)
+        copyrightScreen.addWidget(copyrightText)
+        copyrightScreen.addWidget(self.define_button("Back", 160, 40, self.change_screen, 8))
     
         # Add the different main screens to the stack layout (main window that will change when something happens)
         self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll, 
-                      infoContainer, bluetoothContainer, messagesScroll, settingsContainer, self.textsContainer]
+                      infoContainer, bluetoothContainer, messageContainer, settingsContainer, self.textsContainer, 
+                      languageContainer, informationContainer, copyrightContainer]
         for c in self.containers:
             self.stackLayout.addWidget(c)
 
@@ -231,7 +258,7 @@ class MainWindow(QMainWindow):
         self.listener = ListenerThread()
         self.listener.speed_received.connect(self.adjust_dimming)
         self.listener.start()  # Begin background listening
-        #aself.threadPool.start(speechT)
+        self.threadPool.start(speechT)
         self.threadPool.start(self.tripT)
 
     # Swap screens to specified index
@@ -240,12 +267,13 @@ class MainWindow(QMainWindow):
 
     # Change radio stations
     def change_station(self,station):
-        self.radioLabel.setText("Now listening to: " + station)
+        self.radioLabel.setText(station)
         if (self.radioToggle.text() == "Radio: On"):
             self.radioToggle.setText("Radio: Off")
         else:
             self.radioToggle.setText("Radio: On")
 
+    # Adjust the brightness of the screen and enable / disable buttons
     def adjust_dimming(self, speed:int):
         self.tripT.speed = speed
         if speed < 40:
@@ -285,6 +313,37 @@ class MainWindow(QMainWindow):
                 f"background-color: rgba(255, 255, 255, {alpha});" 
             )
 
+    # Get messages from the messages file for the specific contact and display them
+    def open_messages(self, name):
+        for widget in self.messageWidgets:
+            self.textsMenu.removeWidget(widget)
+        self.messageWidgets = []
+        length = len(name)
+        messagesExist = False
+        messagesFile = open("messages.txt", "r")
+        for line in messagesFile:
+            if name in line[:length]:
+                messagesExist = True
+                widget = self.define_label(line)
+                widget.setMinimumHeight(60)
+                if "From" in line[length:length+5]: 
+                    widget.setAlignment(Qt.AlignmentFlag.AlignLeft)
+                    widget.setText(line[length + 6:])
+                else: 
+                    widget.setAlignment(Qt.AlignmentFlag.AlignRight)
+                    widget.setText(line[length + 4:])
+                self.messageWidgets.append(widget)
+                self.textsMenu.addWidget(widget)
+        if (not messagesExist): 
+            widget = self.define_label("No messages available.")
+            widget.setAlignment(Qt.AlignmentFlag.AlignCenter)
+            self.messageWidgets.append(widget)
+            self.textsMenu.addWidget(widget)
+        backButton = self.define_button("Back", 160, 40, self.change_screen, 7)
+        self.textsMenu.addWidget(backButton)
+        self.messageWidgets.append(backButton)
+        self.change_screen(9)
+
     # Create a button with an icon or text field, width, height and connect it to a method 
     def define_button(self, iconOrText, w, h, method, methodArg):
         button = QPushButton()
@@ -314,6 +373,18 @@ class MainWindow(QMainWindow):
         else:
             self.btToggle.setText("Bluetooth: On")
             self.visibilityLabel.setText("Visible to other devices")
+
+    def connect_device(self, device):
+        self.activeDeviceLabel.setText(f"Connected to: {device}")
+        self.signalLabel.setText("Signal: Good")
+        self.batteryLabel.setText("Battery: 85%")
+        self.errorLabel.setText("")
+
+    def remove_device(self, device):
+        self.errorLabel.setText(f"{device} removed from paired devices.")
+        
+    def pair_new_device(self, _):
+        self.errorLabel.setText("Pairing failed: Device not found.")
 
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
