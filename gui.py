@@ -10,15 +10,8 @@ import speech
 from screendimmer import ListenerThread
 import sys, time, webbrowser
 from datetime import datetime
-
-import speech_recognition as sr
 import pyttsx3
-import os
-import screen_brightness_control as sbc
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
-from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-import re
+from speech import speechThread
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -110,6 +103,10 @@ class MainWindow(QMainWindow):
         phoneContainer = QWidget()
         phoneMenu = QVBoxLayout(phoneContainer)
         phoneScroll = QScrollArea()
+        
+        # for speech
+        self.phoneScroll = phoneScroll 
+        
         # Add contacts list and place them into scroll menu
         self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan",
                          "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
@@ -193,8 +190,15 @@ class MainWindow(QMainWindow):
         # Create a texts container with associated widgets to be used later by open_messages
         self.textsContainer = QWidget()
         self.textsMenu = QVBoxLayout(self.textsContainer)
+<<<<<<< HEAD
         self.message = self.define_label("")
         self.messageWidgets = []
+=======
+        self.message = QLabel("")
+        
+        # for speech
+        self.messagesScroll = messagesScroll 
+>>>>>>> 3c968d1 (refined speech.py)
 
         # Create the settings screen
         settingsContainer = QWidget()
@@ -258,20 +262,30 @@ class MainWindow(QMainWindow):
         self.setFixedHeight(600)
         self.setFixedWidth(900)
 
+        self.current_screen = 0  # Main screen by default
+
+        
         # Define thread pool to run background threads
         self.threadPool = QThreadPool()
+<<<<<<< HEAD
         # Create and start running the speech to text and trip computer threads
         speechT = self.speechThread()
         self.tripT = self.tripThread()
+=======
+        # Create and start running the speech to text and trip computer threads 
+        self.speechT = speechThread(self)
+        self.threadPool.start(self.speechT)
+>>>>>>> 3c968d1 (refined speech.py)
         # Instantiate the listener thread and connect its signal
         self.listener = ListenerThread()
         self.listener.speed_received.connect(self.adjust_dimming)
         self.listener.start()  # Begin background listening
-        self.threadPool.start(speechT)
-        self.threadPool.start(self.tripT)
+        
+        #aself.threadPool.start(self.tripT)
 
     # Swap screens to specified index
     def change_screen(self, index):
+        self.current_screen = index
         self.stackLayout.setCurrentIndex(index)
 
     # Change radio stations
@@ -399,6 +413,7 @@ class MainWindow(QMainWindow):
     def navigate(self, end):
         url = f"https://www.google.com/maps/dir/V14 T863/{end.text()}"
         webbrowser.open(url)
+<<<<<<< HEAD
 
     def handle_voice_command(text, window, volume_interface):
         text = text.lower()
@@ -608,6 +623,32 @@ class MainWindow(QMainWindow):
                 except Exception as e:
                     print("Error:", e)
 
+=======
+        
+    def scrollContent(self, delta):
+        current_screen = self.current_screen
+        if current_screen == 4:  # Phone screen
+            scroll = self.phoneScroll
+        elif current_screen == 7:  # Messages screen
+            scroll = self.messagesScroll
+        else:
+            print("Scroll not available on this screen.")
+            return
+    
+        scroll.verticalScrollBar().setValue(scroll.verticalScrollBar().value() + delta)
+                
+    def change_screen_voice(self, screen_num):
+        print(f"Changing to screen {screen_num}")
+        # Your actual screen change code:
+        self.change_screen(screen_num)
+                
+    def closeEvent(self, event):
+        print("GUI closing, stopping speech and exiting...")
+        if hasattr(self, 'speechT'):
+            self.speechT.stop()   # Tell the speech thread to stop
+        event.accept()                 # Accept close event
+        QApplication.quit()            # Quit the whole application explicitly
+>>>>>>> 3c968d1 (refined speech.py)
 
     # Trip computer. Updates distance traveled every second.
     class tripThread(QRunnable):
@@ -633,4 +674,8 @@ app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
 
+<<<<<<< HEAD
 app.exec()
+=======
+sys.exit(app.exec())
+>>>>>>> 3c968d1 (refined speech.py)
