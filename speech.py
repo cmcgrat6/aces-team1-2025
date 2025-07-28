@@ -1,153 +1,194 @@
-# 
-# run pip install SpeechRecognition pyttsx3 PyAudio pycaw screen-brightness-control (python-telegram-bot==13.15)
-# have to say "hi jaguar" everytime before giving commands
-# commands to test [go to sleep, increase/decrease/set volume/brightness to XX, send message (only a mock for now), open maps]
-#
-
+from PyQt6.QtCore import QRunnable, pyqtSlot
 import speech_recognition as sr
 import pyttsx3
 import webbrowser
-import os
+import re
 import screen_brightness_control as sbc
 from ctypes import cast, POINTER
 from comtypes import CLSCTX_ALL
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
-# from telegram import Bot
-import re
 
-# Telegram setup
-# TELEGRAM_TOKEN = 'YOUR_BOT_TOKEN'
-# CHAT_ID = 'YOUR_CHAT_ID'
-# bot = Bot(token=TELEGRAM_TOKEN)
+class speechThread(QRunnable):
+    def __init__(self, gui):
+        super().__init__()
+        self.gui = gui
+        self.awake = False
+        self.engine = pyttsx3.init()
+        self.recognizer = sr.Recognizer()
+        self.mic = sr.Microphone()
+        self._running = True
 
-# TTS setup
-engine = pyttsx3.init()
-def speak(text):
-    print("Assistant:", text)
-    engine.say(text)
-    engine.runAndWait()
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        self.volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
 
-# Audio recognizer
-recognizer = sr.Recognizer()
-mic = sr.Microphone()
+        # Map voice commands to screen numbers and spoken feedback
+        self.screen_commands = {
+            ("open radio", "go to radio"): (1, "Opening Radio."),
+            ("open maps", "go to maps", "navigate"): (2, "Opening Navigation."),
+            ("open trip computer", "go to trip"): (3, "Opening Trip Computer."),
+            ("open phone", "go to phone"): (4, "Opening Phone."),
+            ("open vehicle", "go to vehicle", "vehicle info"): (5, "Opening Vehicle Info."),
+            ("open bluetooth", "go to bluetooth"): (6, "Opening Bluetooth."),
+            ("open messages", "go to messages"): (7, "Opening Messages."),
+            ("open settings", "go to settings"): (8, "Opening Settings."),
+            ("go back", "go home", "return to main"): (0, "Returning to main screen."),
+        }
 
-# Volume setup
-devices = AudioUtilities.GetSpeakers()
-interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
+    def stop(self):
+        self._running = False
 
-def set_volume(value):
-    value = max(0, min(100, value))
-    volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
+    def speak(self, text):
+        print("Assistant:", text)
+        self.engine.say(text)
+        self.engine.runAndWait()
 
+    def set_volume(self, value):
+        value = max(0, min(100, value))
+        self.volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
 
-def listen():
-    with mic as source:
-        recognizer.adjust_for_ambient_noise(source)
-        audio = recognizer.listen(source)
-    return recognizer.recognize_google(audio).lower()
+    def listen(self, timeout=None, phrase_time_limit=None):
+        with self.mic as source:
+            self.recognizer.adjust_for_ambient_noise(source)
+            try:
+                audio = self.recognizer.listen(source, timeout=timeout, phrase_time_limit=phrase_time_limit)
+                return self.recognizer.recognize_google(audio).lower()
+            except sr.WaitTimeoutError:
+                # Timeout waiting for phrase to start
+                return None
+            except sr.UnknownValueError:
+                # Speech unintelligible
+                return ""
+            except Exception as e:
+                print("Error:", e)
+                return ""
 
-# Main loop
-def main():
-    # Wake control
-    awake = False
-    print("Say 'Hi Jaguar' to activate.")
+    @pyqtSlot()
+    def run(self):
+        print("Say 'Hi Jaguar' to activate.")
 
-    while True:
-        try:
-            print("Listening...")
-            text = input() #listen()
-            print("You said:", text)
+        while self._running:
+            try:
+                if not self.awake:
+                    print("Listening (sleep mode)...")
+                    text = self.listen(timeout=5, phrase_time_limit=5)
+                    if text:
+                        print("You said (sleep mode):", text)
+                        if "hi jaguar" in text:
+                            self.awake = True
+                            self.speak("Hello, how can I help you?")
+                    continue
 
-            if not awake:
-                if "hi jaguar" in text:
-                    awake = True
-                    speak("Yes?")
-                continue
+                # Awake mode: wait for command with timeout
+                print("Listening for command...")
+                text = self.listen(timeout=5, phrase_time_limit=5)
 
-            # Sleep command
-            if "go to sleep" in text:
-                speak("Going to sleep.")
-                awake = False
-                continue
+                if text is None:  # Timeout no speech detected
+                    self.speak("No command received, going to sleep.")
+                    self.awake = False
+                    continue
 
-            # Volume commands
-            if "volume" in text:
-                if "increase" in text:
-                    current = volume_interface.GetMasterVolumeLevelScalar() * 100
-                    set_volume(int(current + 10))
-                    speak("Volume increased.")
-                elif "decrease" in text:
-                    current = volume_interface.GetMasterVolumeLevelScalar() * 100
-                    set_volume(int(current - 10))
-                    speak("Volume decreased.")
-                elif "set" in text:
-                    match = re.search(r"(\d+)", text)
-                    if match:
-                        set_volume(int(match.group(1)))
-                        speak("Volume set.")
-                awake = False
-                continue
+                if text == "":  # Unintelligible speech
+                    print("Could not understand command.")
+                    continue
 
-            # Brightness commands
-            if "brightness" in text:
-                if "increase" in text:
-                    sbc.set_brightness("+=10")
-                    speak("Brightness increased.")
-                elif "decrease" in text:
-                    sbc.set_brightness("-=10")
-                    speak("Brightness decreased.")
-                elif "set" in text:
-                    match = re.search(r"(\d+)", text)
-                    if match:
-                        sbc.set_brightness(int(match.group(1)))
-                        speak("Brightness set.")
-                awake = False
-                continue
+                print("You said:", text)
 
-            # Maps
-            if "open maps" in text or "navigate" in text:
-                speak("Starting point?")
-                start = input() #listen()
-                speak("Destination?")
-                end = input() #listen()
-                url = f"https://www.google.com/maps/dir/{start}/{end}"
-                webbrowser.open(url)
-                speak("Opened Google Maps.")
-                awake = False
-                continue
+                # Check screen switching commands first
+                for keywords, (screen_num, response) in self.screen_commands.items():
+                    if any(keyword in text for keyword in keywords):
+                        self.gui.change_screen_voice(screen_num)
+                        self.speak(response)
+                        break
+                else:
+                    # Process other commands here
 
-            # Telegram messaging
-            if "send message" in text or "telegram" in text:
-                speak("What should I send?")
-                message = input() #listen()
-                print(f"[Mock] Would send this message via Telegram: {message}")
-                speak("Message saved for Telegram demo.")
-                with open("demo_mock_messages.txt", "a") as f:
-                    f.write(f"{message}\n")
-                awake = False
-                continue
+                    if "go to sleep" in text:
+                        self.speak("Going to sleep.")
+                        self.awake = False
+                        continue
 
-            # GUI Switches
-            commands = {"back":0, "home":0, "return":0, "radio": 1, "map":2, "nav":2, "satnav":2, "trip":3, "computer":3, "phone":4, "vehicle":5,
-                        "info":5, "bluetooth":6, "seat":7, "settings":8}
-            for entry in commands:
-                if (entry == text):
-                    awake = False
-                    return commands.get(entry)
+                    # Volume control
+                    if "volume" in text:
+                        current = self.volume_interface.GetMasterVolumeLevelScalar() * 100
+                        match = re.search(r"(\d+)", text)
 
-            # Radio Stations
-            stations = {"rte one": "RTE 1", "rte two": "RTE 2", "newstalk": "NEWSTALK", "spin": "SPIN SW"}
-            for entry in stations:
-                if (entry in text):
-                    awake = False
-                    return stations.get(entry)
+                        if "set" in text and match:
+                            self.set_volume(int(match.group(1)))
+                            self.speak(f"Volume set to {match.group(1)}.")
+                        elif "increase" in text:
+                            if match:
+                                self.set_volume(int(match.group(1)))
+                                self.speak(f"Volume increased to {match.group(1)}.")
+                            else:
+                                self.set_volume(int(current + 10))
+                                self.speak("Volume increased.")
+                        elif "decrease" in text:
+                            if match:
+                                self.set_volume(int(match.group(1)))
+                                self.speak(f"Volume decreased to {match.group(1)}.")
+                            else:
+                                self.set_volume(int(current - 10))
+                                self.speak("Volume decreased.")
+                        continue
 
-            # Unknown
-            speak("Command not recognized. Please try again.")
+                    # Brightness control
+                    if "brightness" in text:
+                        if "increase" in text:
+                            sbc.set_brightness("+=10")
+                            self.speak("Brightness increased.")
+                        elif "decrease" in text:
+                            sbc.set_brightness("-=10")
+                            self.speak("Brightness decreased.")
+                        elif "set" in text:
+                            match = re.search(r"(\d+)", text)
+                            if match:
+                                sbc.set_brightness(int(match.group(1)))
+                                self.speak("Brightness set.")
+                        continue
 
-        except sr.UnknownValueError:
-            print("Could not understand.")
-        except Exception as e:
-            print("Error:", e)
+                    # Google Maps navigation
+                    if "open google map" in text:
+                        self.speak("Starting point?")
+                        start = self.listen(timeout=5, phrase_time_limit=10)
+                        if not start:
+                            self.speak("No starting point received, cancelling.")
+                            self.awake = False
+                            continue
+                        self.speak("Destination?")
+                        end = self.listen(timeout=5, phrase_time_limit=10)
+                        if not end:
+                            self.speak("No destination received, cancelling.")
+                            self.awake = False
+                            continue
+                        url = f"https://www.google.com/maps/dir/{start}/{end}"
+                        webbrowser.open(url)
+                        self.speak("Opened Google Maps.")
+                        continue
 
+                    # Scroll demo
+                    if "scroll down" in text:
+                        self.gui.scrollContent(50)
+                        self.speak("Scrolled down.")
+                        continue
+                    elif "scroll up" in text:
+                        self.gui.scrollContent(-50)
+                        self.speak("Scrolled up.")
+                        continue
+
+                    # Messaging mock
+                    if "send message" in text or "telegram" in text:
+                        self.speak("What should I send?")
+                        message = self.listen(timeout=5, phrase_time_limit=10)
+                        if message:
+                            with open("demo_mock_messages.txt", "a") as f:
+                                f.write(f"{message}\n")
+                            self.speak("Message saved for demo.")
+                        else:
+                            self.speak("No message received.")
+                        continue
+
+                    # If no recognized commands
+                    self.speak("Command not recognized.")
+
+        print("Speech thread exiting cleanly.")
