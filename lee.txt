@@ -1,0 +1,21 @@
+is there anything similar to this project in the pipleine for jlr?
+
+nothing as extreme as just voice control, they have other attention control methods. also working on reducing the amount of demand created by the systems in the cars
+they already use voice a bit, providing voice controls at an "appropriate level", also "proactive voice commands", they get to the point that the car nudges them towards using voice instead of speech
+android auto tells you after you do something that you can use voice commands, apple carplay just guides you through doing things with voice
+the challenge to think about is "how can you get the balance of the voice system and the screen?", as you can't do everything through voice
+people will also tend to look at things as they talk to them - point of consideration with screen dimming / disabling
+(update: john says that this isn't really a concern since that is all integrated into the modern cars' heads up display)
+jlr have the satnav which says "you can use the keyboard but we'd really like for you to use voice"
+"turning everything to voice" isnt something they have actively looked at
+"how can we move people over to making voice a more appropriate choice than physical input" is a big question they've been considering 
+not everyone wants to use voice, some voices wont work depending on accents
+if you start a task in one mode it wont change until the next task, i.e. if you start the satnav with voice you can't switch to touch halfway through
+
+how viable is this project?
+most car companies are looking into it, but again it is all about switching contexts / people's preferences, exploring the idea and thinking about how you design it is still worth looking into
+
+last name pronounced scripchuck
+
+icons link
+https://jlrglobal.sharepoint.com/sites/human-factors/SitePages/tool-symbols.aspx?xsdata=MDV8MDJ8fGI3MGYwOGJkMjZmOTQ0MGQyZmJlMDhkZGJhYzllM2E4fDRjMDg3ZjgwMWUwNzRmNzI5ZTQxZDdkOTc0OGQwZjRjfDB8MHw2Mzg4NzIwOTg0MjcxMjE1OTh8VW5rbm93bnxWR1ZoYlhOVFpXTjFjbWwwZVZObGNuWnBZMlY4ZXlKRFFTSTZJbFJsWVcxelgwRlVVRk5sY25acFkyVmZVMUJQVEU5R0lpd2lWaUk2SWpBdU1DNHdNREF3SWl3aVVDSTZJbGRwYmpNeUlpd2lRVTRpT2lKUGRHaGxjaUlzSWxkVUlqb3hNWDA9fDF8TDJOb1lYUnpMekU1T2pFNE1UUXpaV05tTFRJeE5EZ3ROR05rTXkwNE9HVTRMVEEwWkdFeU56TmxNekpqWmw4eVpqVTJPREZtWXkwME1tTmlMVFF5WVRFdFlUTmpZeTB4TVRnNVlUazROV1pqWVROQWRXNXhMbWRpYkM1emNHRmpaWE12YldWemMyRm5aWE12TVRjMU1UWXhNekEwTVRjMk13PT18OThhOTRjYmMyMGE3NGIxNjJmYmUwOGRkYmFjOWUzYTh8ZjgwNzBkOGM4YzUyNDAzOGIyNDA0MDE0MTY1NWQ5YzQ%3D&sdata=bVhyTnJWejRVN1ZLNEJ4aGFWaGI1aE1wbXkybjJXYm82RVRKSlAxVWpwMD0%3D&ovuser=4c087f80-1e07-4f72-9e41-d7d9748d0f4c%2CLSKRYPCH%40jaguarlandrover.com
