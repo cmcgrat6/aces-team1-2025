@@ -35,6 +35,13 @@ class speechThread(QRunnable):
             ("go back", "go home", "return to main"): (0, "Returning to main screen."),
         }
 
+        self.station_commands = {
+            ("switch to rte 1"): ("RTE 1", "Now playing RTE 1."),
+            ("switch to rte 2"): ("RTE 2", "Now playing RTE 2."),
+            ("switch to news talk"): ("Newstalk", "Now playing News Talk."),
+            ("switch to spin southwest", "switch to spin sw"): ("SPIN SW", "Now playing spin southwest."),
+        }
+
     def stop(self):
         self._running = False
 
@@ -98,6 +105,11 @@ class speechThread(QRunnable):
                 for keywords, (screen_num, response) in self.screen_commands.items():
                     if any(keyword in text for keyword in keywords):
                         self.gui.change_screen_voice(screen_num)
+                        self.speak(response)
+                        break
+                for keywords, (station_name, response) in self.station_commands.items():
+                    if any(keyword in text for keyword in keywords):
+                        self.gui.change_station_voice(station_name)
                         self.speak(response)
                         break
                 else:
@@ -168,27 +180,57 @@ class speechThread(QRunnable):
 
                     # Scroll demo
                     if "scroll down" in text:
-                        self.gui.scrollContent(50)
+                        self.gui.scrollContent(100)
                         self.speak("Scrolled down.")
                         continue
                     elif "scroll up" in text:
-                        self.gui.scrollContent(-50)
+                        self.gui.scrollContent(-100)
                         self.speak("Scrolled up.")
                         continue
 
                     # Messaging mock
-                    if "send message" in text or "telegram" in text:
-                        self.speak("What should I send?")
-                        message = self.listen(timeout=5, phrase_time_limit=10)
-                        if message:
-                            with open("demo_mock_messages.txt", "a") as f:
-                                f.write(f"{message}\n")
-                            self.speak("Message saved for demo.")
-                        else:
-                            self.speak("No message received.")
-                        continue
+                    # if "send message" in text or "telegram" in text:
+                    #     self.speak("What should I send?")
+                    #     message = self.listen(timeout=5, phrase_time_limit=10)
+                    #     if message:
+                    #         with open("demo_mock_messages.txt", "a") as f:
+                    #             f.write(f"{message}\n")
+                    #         self.speak("Message saved for demo.")
+                    #     else:
+                    #         self.speak("No message received.")
+                    #     continue
+
+
+                    # --- bluetooth toggle ---
+                    if "turn bluetooth off" in text:
+                        if self.gui.btToggle.text() != "Bluetooth: Off":
+                            self.gui.change_screen(6)
+                            self.gui.toggle_bluetooth(None)
+                        return "Bluetooth turned off."
+
+                    elif "turn bluetooth on" in text:
+                        if self.gui.btToggle.text() != "Bluetooth: On":
+                            self.gui.change_screen(6)
+                            self.gui.toggle_bluetooth(None)
+                        return "Bluetooth turned on."
+
+                    # --- radio toggle in settings ---
+                    elif "turn radio off" in text:
+                        if self.gui.radioToggle.text() != "Radio: Off":
+                            self.gui.change_screen(8)
+                            self.gui.change_station("")
+                        return "Radio turned off."
+
+                    elif "turn radio on" in text:
+                        if self.gui.radioToggle.text() != "Radio: On":
+                            self.gui.change_screen(8)
+                            self.gui.change_station("")
+                        return "Radio turned on."
 
                     # If no recognized commands
                     self.speak("Command not recognized.")
+
+            except Exception as e:
+                print("Error:", e)
 
         print("Speech thread exiting cleanly.")
