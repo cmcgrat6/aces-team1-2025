@@ -400,38 +400,37 @@ class MainWindow(QMainWindow):
     def navigate(self, end):
         url = f"https://www.google.com/maps/dir/V14 T863/{end.text()}"
         webbrowser.open(url)
-<<<<<<< HEAD
 
     def handle_voice_command(text, window, volume_interface):
         text = text.lower()
 
-        # --- scrolling ---
-        if "scroll down phone" in text:
-            window.phoneScroll.verticalScrollBar().setValue(
-                window.phoneScroll.verticalScrollBar().value() + 100
-            )
-            return "Scrolling down the phone list."
+        # # --- scrolling ---
+        # if "scroll down phone" in text:
+        #     window.phoneScroll.verticalScrollBar().setValue(
+        #         window.phoneScroll.verticalScrollBar().value() + 100
+        #     )
+        #     return "Scrolling down the phone list."
 
-        elif "scroll up phone" in text:
-            window.phoneScroll.verticalScrollBar().setValue(
-                window.phoneScroll.verticalScrollBar().value() - 100
-            )
-            return "Scrolling up the phone list."
+        # elif "scroll up phone" in text:
+        #     window.phoneScroll.verticalScrollBar().setValue(
+        #         window.phoneScroll.verticalScrollBar().value() - 100
+        #     )
+        #     return "Scrolling up the phone list."
 
-        elif "scroll down messages" in text:
-            window.messagesScroll.verticalScrollBar().setValue(
-                window.messagesScroll.verticalScrollBar().value() + 100
-            )
-            return "Scrolling down your messages."
+        # elif "scroll down messages" in text:
+        #     window.messagesScroll.verticalScrollBar().setValue(
+        #         window.messagesScroll.verticalScrollBar().value() + 100
+        #     )
+        #     return "Scrolling down your messages."
 
-        elif "scroll up messages" in text:
-            window.messagesScroll.verticalScrollBar().setValue(
-                window.messagesScroll.verticalScrollBar().value() - 100
-            )
-            return "Scrolling up your messages."
+        # elif "scroll up messages" in text:
+        #     window.messagesScroll.verticalScrollBar().setValue(
+        #         window.messagesScroll.verticalScrollBar().value() - 100
+        #     )
+        #     return "Scrolling up your messages."
 
         # --- radio stations ---
-        elif "switch to rte 1" in text:
+        if "switch to rte 1" in text:
             window.change_screen(1)
             window.change_station("RTE 1")
             return "Now playing RTE 1."
@@ -477,140 +476,139 @@ class MainWindow(QMainWindow):
                 window.change_station("")
             return "Radio turned on."
 
-        # --- volume ---
-        elif "increase volume" in text:
-            current = volume_interface.GetMasterVolumeLevelScalar() * 100
-            window.set_volume(int(current + 10))
-            return "Volume increased."
+        # # --- volume ---
+        # elif "increase volume" in text:
+        #     current = volume_interface.GetMasterVolumeLevelScalar() * 100
+        #     window.set_volume(int(current + 10))
+        #     return "Volume increased."
 
-        elif "decrease volume" in text:
-            current = volume_interface.GetMasterVolumeLevelScalar() * 100
-            window.set_volume(int(current - 10))
-            return "Volume decreased."
+        # elif "decrease volume" in text:
+        #     current = volume_interface.GetMasterVolumeLevelScalar() * 100
+        #     window.set_volume(int(current - 10))
+        #     return "Volume decreased."
 
-        elif "set volume to" in text:
-            match = re.search(r"(\d+)", text)
-            if match:
-                window.set_volume(int(match.group(1)))
-                return f"Volume set to {match.group(1)}."
+        # elif "set volume to" in text:
+        #     match = re.search(r"(\d+)", text)
+        #     if match:
+        #         window.set_volume(int(match.group(1)))
+        #         return f"Volume set to {match.group(1)}."
 
-        # --- brightness ---
-        elif "increase brightness" in text:
-            sbc.set_brightness("+=10")
-            return "Brightness increased."
+        # # --- brightness ---
+        # elif "increase brightness" in text:
+        #     sbc.set_brightness("+=10")
+        #     return "Brightness increased."
 
-        elif "decrease brightness" in text:
-            sbc.set_brightness("-=10")
-            return "Brightness decreased."
+        # elif "decrease brightness" in text:
+        #     sbc.set_brightness("-=10")
+        #     return "Brightness decreased."
 
-        elif "set brightness to" in text:
-            match = re.search(r"(\d+)", text)
-            if match:
-                sbc.set_brightness(int(match.group(1)))
-                return f"Brightness set to {match.group(1)} percent."
+        # elif "set brightness to" in text:
+        #     match = re.search(r"(\d+)", text)
+        #     if match:
+        #         sbc.set_brightness(int(match.group(1)))
+        #         return f"Brightness set to {match.group(1)} percent."
 
         return None
 
-    # Thread class to run the speech recognition in the background
-    class speechThread(QRunnable):
-        @pyqtSlot()
-        def run(self):
-            recognizer = sr.Recognizer()
-            mic = sr.Microphone()
-            engine = pyttsx3.init()
+    # # Thread class to run the speech recognition in the background
+    # class speechThread(QRunnable):
+    #     @pyqtSlot()
+    #     def run(self):
+    #         recognizer = sr.Recognizer()
+    #         mic = sr.Microphone()
+    #         engine = pyttsx3.init()
 
-            def speak(text):
-                print("Assistant:", text)
-                engine.say(text)
-                engine.runAndWait()
+    #         def speak(text):
+    #             print("Assistant:", text)
+    #             engine.say(text)
+    #             engine.runAndWait()
 
-            devices = AudioUtilities.GetSpeakers()
-            interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-            volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
+    #         devices = AudioUtilities.GetSpeakers()
+    #         interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    #         volume_interface = cast(interface, POINTER(IAudioEndpointVolume))
 
-            def set_volume(value):
-                value = max(0, min(100, value))
-                volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
-                window.set_volume = set_volume  # Make it accessible from helper
+    #         def set_volume(value):
+    #             value = max(0, min(100, value))
+    #             volume_interface.SetMasterVolumeLevelScalar(value / 100.0, None)
+    #             window.set_volume = set_volume  # Make it accessible from helper
 
-            def listen():
-                with mic as source:
-                    recognizer.adjust_for_ambient_noise(source)
-                    audio = recognizer.listen(source)
-                return recognizer.recognize_google(audio).lower()
+    #         def listen():
+    #             with mic as source:
+    #                 recognizer.adjust_for_ambient_noise(source)
+    #                 audio = recognizer.listen(source)
+    #             return recognizer.recognize_google(audio).lower()
 
-            awake = False
-            print("Say 'Hi Jaguar' to activate.")
+    #         awake = False
+    #         print("Say 'Hi Jaguar' to activate.")
 
-            while True:
-                try:
-                    print("Listening...")
-                    text = listen()
-                    print("You said:", text)
+    #         while True:
+    #             try:
+    #                 print("Listening...")
+    #                 text = listen()
+    #                 print("You said:", text)
 
-                    if not awake:
-                        if "hi jaguar" in text:
-                            awake = True
-                            speak("Yes?")
-                        continue
+    #                 if not awake:
+    #                     if "hi jaguar" in text:
+    #                         awake = True
+    #                         speak("Yes?")
+    #                     continue
 
-                    if "go to sleep" in text:
-                        speak("Going to sleep.")
-                        awake = False
-                        continue
+    #                 if "go to sleep" in text:
+    #                     speak("Going to sleep.")
+    #                     awake = False
+    #                     continue
 
-                    # screen switching & maps logic
-                    if "open maps" in text or "go to maps" in text:
-                        window.change_screen(2)
-                        speak("Opening Navigation.")
-                        speak("Starting point?")
-                        start = listen()
-                        speak("Destination?")
-                        end = listen()
-                        url = f"https://www.google.com/maps/dir/{start}/{end}"
-                        webbrowser.open(url)
-                        speak("Opened Google Maps.")
-                        awake = False
-                        continue
+    #                 # screen switching & maps logic
+    #                 if "open maps" in text or "go to maps" in text:
+    #                     window.change_screen(2)
+    #                     speak("Opening Navigation.")
+    #                     speak("Starting point?")
+    #                     start = listen()
+    #                     speak("Destination?")
+    #                     end = listen()
+    #                     url = f"https://www.google.com/maps/dir/{start}/{end}"
+    #                     webbrowser.open(url)
+    #                     speak("Opened Google Maps.")
+    #                     awake = False
+    #                     continue
 
-                    elif "open radio" in text:
-                        window.change_screen(1)
-                        speak("Opening Radio.")
-                    elif "open phone" in text:
-                        window.change_screen(4)
-                        speak("Opening Phone.")
-                    elif "open messages" in text:
-                        window.change_screen(7)
-                        speak("Opening Messages.")
-                    elif "open bluetooth" in text:
-                        window.change_screen(6)
-                        speak("Opening Bluetooth.")
-                    elif "open settings" in text:
-                        window.change_screen(8)
-                        speak("Opening Settings.")
-                    elif "open trip computer" in text:
-                        window.change_screen(3)
-                        speak("Opening Trip Computer.")
-                    elif "open vehicle" in text:
-                        window.change_screen(5)
-                        speak("Opening Vehicle Info.")
+    #                 elif "open radio" in text:
+    #                     window.change_screen(1)
+    #                     speak("Opening Radio.")
+    #                 elif "open phone" in text:
+    #                     window.change_screen(4)
+    #                     speak("Opening Phone.")
+    #                 elif "open messages" in text:
+    #                     window.change_screen(7)
+    #                     speak("Opening Messages.")
+    #                 elif "open bluetooth" in text:
+    #                     window.change_screen(6)
+    #                     speak("Opening Bluetooth.")
+    #                 elif "open settings" in text:
+    #                     window.change_screen(8)
+    #                     speak("Opening Settings.")
+    #                 elif "open trip computer" in text:
+    #                     window.change_screen(3)
+    #                     speak("Opening Trip Computer.")
+    #                 elif "open vehicle" in text:
+    #                     window.change_screen(5)
+    #                     speak("Opening Vehicle Info.")
 
-                    # run voice command handler
-                    response = handle_voice_command(text, window, volume_interface)
-                    if response:
-                        speak(response)
-                        awake = False
-                        continue
+    #                 # run voice command handler
+    #                 response = handle_voice_command(text, window, volume_interface)
+    #                 if response:
+    #                     speak(response)
+    #                     awake = False
+    #                     continue
 
-                    speak("Command not recognized.")
-                    awake = False
+    #                 speak("Command not recognized.")
+    #                 awake = False
 
-                except sr.UnknownValueError:
-                    print("Could not understand.")
-                except Exception as e:
-                    print("Error:", e)
+    #             except sr.UnknownValueError:
+    #                 print("Could not understand.")
+    #             except Exception as e:
+    #                 print("Error:", e)
 
-=======
 
     def scrollContent(self, delta):
         current_screen = self.current_screen
@@ -624,10 +622,18 @@ class MainWindow(QMainWindow):
 
         scroll.verticalScrollBar().setValue(scroll.verticalScrollBar().value() + delta)
 
+    # change screen, station with voice commands
     def change_screen_voice(self, screen_num):
         print(f"Changing to screen {screen_num}")
-        # Your actual screen change code:
         self.change_screen(screen_num)
+
+    def change_station_voice(self, station):
+        print(f"Changing to station {station}")
+        self.radioLabel.setText(station)
+        if (self.radioToggle.text() == "Radio: On"):
+            self.radioToggle.setText("Radio: Off")
+        else:
+            self.radioToggle.setText("Radio: On")
 
     def closeEvent(self, event):
         print("GUI closing, stopping speech and exiting...")
@@ -635,7 +641,6 @@ class MainWindow(QMainWindow):
             self.speechT.stop()   # Tell the speech thread to stop
         event.accept()                 # Accept close event
         QApplication.quit()            # Quit the whole application explicitly
->>>>>>> 3c968d1 (refined speech.py)
 
     # Trip computer. Updates distance traveled every second.
     class tripThread(QRunnable):
@@ -661,8 +666,4 @@ app = QApplication(sys.argv)
 window = MainWindow()
 window.show()
 
-<<<<<<< HEAD
-app.exec()
-=======
 sys.exit(app.exec())
->>>>>>> 3c968d1 (refined speech.py)
