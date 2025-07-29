@@ -103,10 +103,10 @@ class MainWindow(QMainWindow):
         phoneContainer = QWidget()
         phoneMenu = QVBoxLayout(phoneContainer)
         phoneScroll = QScrollArea()
-        
+
         # for speech
-        self.phoneScroll = phoneScroll 
-        
+        self.phoneScroll = phoneScroll
+
         # Add contacts list and place them into scroll menu
         self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan",
                          "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
@@ -190,15 +190,8 @@ class MainWindow(QMainWindow):
         # Create a texts container with associated widgets to be used later by open_messages
         self.textsContainer = QWidget()
         self.textsMenu = QVBoxLayout(self.textsContainer)
-<<<<<<< HEAD
         self.message = self.define_label("")
         self.messageWidgets = []
-=======
-        self.message = QLabel("")
-        
-        # for speech
-        self.messagesScroll = messagesScroll 
->>>>>>> 3c968d1 (refined speech.py)
 
         # Create the settings screen
         settingsContainer = QWidget()
@@ -264,23 +257,17 @@ class MainWindow(QMainWindow):
 
         self.current_screen = 0  # Main screen by default
 
-        
+
         # Define thread pool to run background threads
         self.threadPool = QThreadPool()
-<<<<<<< HEAD
         # Create and start running the speech to text and trip computer threads
         speechT = self.speechThread()
         self.tripT = self.tripThread()
-=======
-        # Create and start running the speech to text and trip computer threads 
-        self.speechT = speechThread(self)
-        self.threadPool.start(self.speechT)
->>>>>>> 3c968d1 (refined speech.py)
         # Instantiate the listener thread and connect its signal
         self.listener = ListenerThread()
         self.listener.speed_received.connect(self.adjust_dimming)
         self.listener.start()  # Begin background listening
-        
+
         #aself.threadPool.start(self.tripT)
 
     # Swap screens to specified index
@@ -409,7 +396,7 @@ class MainWindow(QMainWindow):
     def pair_new_device(self, _):
         self.errorLabel.setText("Pairing failed: Device not found.")
 
-    # Open Google Maps with the specified start and end destinations (temp)
+    # open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
         url = f"https://www.google.com/maps/dir/V14 T863/{end.text()}"
         webbrowser.open(url)
@@ -624,7 +611,7 @@ class MainWindow(QMainWindow):
                     print("Error:", e)
 
 =======
-        
+
     def scrollContent(self, delta):
         current_screen = self.current_screen
         if current_screen == 4:  # Phone screen
@@ -634,14 +621,14 @@ class MainWindow(QMainWindow):
         else:
             print("Scroll not available on this screen.")
             return
-    
+
         scroll.verticalScrollBar().setValue(scroll.verticalScrollBar().value() + delta)
-                
+
     def change_screen_voice(self, screen_num):
         print(f"Changing to screen {screen_num}")
         # Your actual screen change code:
         self.change_screen(screen_num)
-                
+
     def closeEvent(self, event):
         print("GUI closing, stopping speech and exiting...")
         if hasattr(self, 'speechT'):
