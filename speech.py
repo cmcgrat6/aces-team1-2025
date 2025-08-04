@@ -222,11 +222,12 @@ class speechThread(QRunnable):
 
                     # set brightness
                     if "brightness" in text:
+                        current = sbc.get_brightness()[0]
                         if "increase" in text:
-                            sbc.set_brightness("+=10")
+                            sbc.set_brightness(int(current + 10))
                             self.speak("Brightness increased.")
                         elif "decrease" in text:
-                            sbc.set_brightness("-=10")
+                            sbc.set_brightness(int(current - 10))
                             self.speak("Brightness decreased.")
                         elif "set" in text:
                             match = re.search(r"(\d+)", text)
