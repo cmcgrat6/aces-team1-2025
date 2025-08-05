@@ -73,13 +73,16 @@ class speechThread(QRunnable):
             ("open bluetooth", "go to bluetooth"): (6, "Opening Bluetooth Screen."),
             ("open messages", "go to messages"): (7, "Opening Messages Screen."),
             ("open settings", "go to settings"): (8, "Opening Settings Screen."),
-            ("go back", "go home", "return to main"): (0, "Returning to main screen."),
+            ("open language", "go to language"): (10, "Opening Language Screen."),
+            ("open system", "go to system"): (11, "Opening System Information Screen."),
+            ("open copyright", "go to copyright"): (12, "Opening Copyright Screen."),
+            ("go back", "go home", "return to main", "back", "exit"): (0, "Returning to main screen."),
         }
 
         # keywords for changing radio stations
         self.station_commands = {
-            ("switch to rte 1",): ("RTE 1", "Now playing RTE 1."),
-            ("switch to rte 2",): ("RTE 2", "Now playing RTE 2."),
+            ("switch to rte 1", "switch to rte one"): ("RTE 1", "Now playing RTE 1."),
+            ("switch to rte 2", "switch to rte two"): ("RTE 2", "Now playing RTE 2."),
             ("switch to news talk",): ("Newstalk", "Now playing News Talk."),
             ("switch to spin southwest", "switch to spin sw"): ("SPIN SW", "Now playing Spin Southwest."),
         }
@@ -130,7 +133,7 @@ class speechThread(QRunnable):
                 if not self.awake:
                     # no wake word said
                     print("Listening (sleep mode)...")
-                    text = self.listen(timeout=3, phrase_time_limit=5)
+                    text = input() # jeff self.listen(timeout=3, phrase_time_limit=5)
                     if text:
                         print("You said (sleep mode):", text)
                         if "hi jaguar" in text: # wake word said
@@ -139,7 +142,7 @@ class speechThread(QRunnable):
                     continue
 
                 print("Listening for command...") # waiting for command
-                text = self.listen(timeout=5, phrase_time_limit=5)
+                text = input() # jeff self.listen(timeout=5, phrase_time_limit=5)
 
                 if text is None:
                     self.speak("No command received, going to sleep.") # return to sleep after some time without commands
@@ -246,14 +249,15 @@ class speechThread(QRunnable):
                         else:
                             for _ in range(3):
                                 self.speak("Where are you going?")
-                                response = self.listen(timeout=5, phrase_time_limit=10)
+                                response = input () # jeff self.listen(timeout=5, phrase_time_limit=10)
                     
                                 if response:
                                     print(f"You said: {response}")
                     
                                     if self.is_cancel_command(response):
-                                        self.speak("Navigation cancelled.")
                                         destination = None
+                                        self.signals.change_screen.emit(0)
+                                        self.speak("Navigation cancelled.")
                                         break
                     
                                     destination = response
@@ -277,7 +281,7 @@ class speechThread(QRunnable):
                             elif distance and duration:
                                 self.speak(f"The distance is {distance} and it will take approximately {duration}.")
                             else:
-                                self.speak("I couldn't retrieve travel information.")
+                                self.speak("I couldn't retrieve travel information.")            
                         
                         continue  # Important to avoid falling through to "Command not recognized"
 

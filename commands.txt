@@ -1,0 +1,12 @@
+command list 
+open / go to [screen name] 
+switch to [radio station]
+back / exit / go back / go home / return to main 
+thank you / go to sleep / turn on bluetooth or radio / turn on bluetooth or radio
+volume increase / decrease / set
+brightness increase / decrease / set
+open maps / navigate / bring me to [destination]
+stop navigation / cancel / nevermind
+scroll down / up
+open chat with / read messages from [person]
+names: amy, caitlin, dave work, home, john, landlord, lisa, monica, morgan, paul, pizza, sean, sylvester do not answer, tyrell

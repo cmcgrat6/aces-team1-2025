@@ -60,10 +60,10 @@ class SpeedControl(QWidget):
 
         # Layout for the '+' and '–' buttons
         btn_layout = QHBoxLayout()
-        for text, difference in [("–", -5), ("+", 5)]:
+        for text, difference in [("–", -10), ("+", 10)]:
             btn = QPushButton(text)
             btn.setFixedWidth(50)
-            # Pass the difference (+5 or -5) when the button is clicked
+            # Pass the difference (+10 or -10) when the button is clicked
             btn.clicked.connect(lambda _, d=difference: self.adjust_speed(d))
             btn_layout.addWidget(btn)
 
