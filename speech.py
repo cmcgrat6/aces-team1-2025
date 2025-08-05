@@ -133,7 +133,7 @@ class speechThread(QRunnable):
                 if not self.awake:
                     # no wake word said
                     print("Listening (sleep mode)...")
-                    text = input() # jeff self.listen(timeout=3, phrase_time_limit=5)
+                    text = self.listen(timeout=3, phrase_time_limit=5)
                     if text:
                         print("You said (sleep mode):", text)
                         if "hi jaguar" in text: # wake word said
@@ -142,7 +142,7 @@ class speechThread(QRunnable):
                     continue
 
                 print("Listening for command...") # waiting for command
-                text = input() # jeff self.listen(timeout=5, phrase_time_limit=5)
+                text = self.listen(timeout=5, phrase_time_limit=5)
 
                 if text is None:
                     self.speak("No command received, going to sleep.") # return to sleep after some time without commands
@@ -249,7 +249,7 @@ class speechThread(QRunnable):
                         else:
                             for _ in range(3):
                                 self.speak("Where are you going?")
-                                response = input () # jeff self.listen(timeout=5, phrase_time_limit=10)
+                                response = self.listen(timeout=5, phrase_time_limit=10)
                     
                                 if response:
                                     print(f"You said: {response}")
@@ -342,3 +342,4 @@ class speechThread(QRunnable):
         
         # close thread when program is stopped
         print("Speech thread exiting cleanly.")
+
