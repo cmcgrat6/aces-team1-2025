@@ -1,16 +1,20 @@
 # run pip install pyqt6 SpeechRecognition pyttsx3 PyAudio pycaw screen-brightness-control
 # press any button to go to its specific screen 
 
-from PyQt6.QtWidgets import QApplication, QScrollArea, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLineEdit, QGridLayout, QStackedLayout
+from PyQt6.QtWidgets import QApplication, QScrollArea, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QWidget, \
+    QPushButton, QLineEdit, QGridLayout, QStackedLayout
 from PyQt6 import QtGui, QtCore
 from PyQt6.QtCore import QRunnable, pyqtSlot, QThreadPool, Qt
 from PyQt6.QtGui import QPixmap
 
+from phone_menu import create_phone_menu
+
 import speech
-#aimport speech
+# aimport speech
 from screendimmer import ListenerThread
 import sys, time, webbrowser
 from datetime import datetime
+
 
 class MainWindow(QMainWindow):
     def __init__(self):
@@ -20,8 +24,8 @@ class MainWindow(QMainWindow):
             self.setStyleSheet(file.read())
 
         self.setWindowTitle("Really early version")
-    
-        # Define each different layout 
+
+        # Define each different layout
         container = QWidget()
         layout = QGridLayout()
         homeScreenLayout = QGridLayout(container)
@@ -33,32 +37,32 @@ class MainWindow(QMainWindow):
         self.labels = []
 
         # Define each button for the home screen
-        button1 = self.define_button("images/radio.png", 200,200,self.change_screen, 1)
-        button2 = self.define_button("images/maps.png",200,200,self.change_screen,2)
-        button3 = self.define_button("images/tripcomputer.png",200,200,self.change_screen,3)
-        button4 = self.define_button("images/phone.png",200,200,self.change_screen,4)
-        button5 = self.define_button("images/vehicleinfo.png",200,200,self.change_screen,5)
-        button6 = self.define_button("images/bluetooth.png",200,200,self.change_screen,6)
-        button7 = self.define_button("images/messages.png",200,200,self.change_screen,7)
-        button8 = self.define_button("images/settings.png",200,200,self.change_screen,8)
+        button1 = self.define_button("images/radio.png", 200, 200, self.change_screen, 1)
+        button2 = self.define_button("images/maps.png", 200, 200, self.change_screen, 2)
+        button3 = self.define_button("images/tripcomputer.png", 200, 200, self.change_screen, 3)
+        button4 = self.define_button("images/phone.png", 200, 200, self.change_screen, 4)
+        button5 = self.define_button("images/vehicleinfo.png", 200, 200, self.change_screen, 5)
+        button6 = self.define_button("images/bluetooth.png", 200, 200, self.change_screen, 6)
+        button7 = self.define_button("images/messages.png", 200, 200, self.change_screen, 7)
+        button8 = self.define_button("images/settings.png", 200, 200, self.change_screen, 8)
 
         # Add the home screen buttons to the home screen with grid coordinates
         homeScreenLayout.addWidget(button1, 0, 0)
         homeScreenLayout.addWidget(button2, 0, 1)
         homeScreenLayout.addWidget(button3, 0, 2)
         homeScreenLayout.addWidget(button4, 0, 3)
-        homeScreenLayout.addWidget(self.define_label("Radio"),1,0)
-        homeScreenLayout.addWidget(self.define_label("Navigation"),1,1)
-        homeScreenLayout.addWidget(self.define_label("Trip Computer"),1,2)
-        homeScreenLayout.addWidget(self.define_label("Phone"),1,3)
+        homeScreenLayout.addWidget(self.define_label("Radio"), 1, 0)
+        homeScreenLayout.addWidget(self.define_label("Navigation"), 1, 1)
+        homeScreenLayout.addWidget(self.define_label("Trip Computer"), 1, 2)
+        homeScreenLayout.addWidget(self.define_label("Phone"), 1, 3)
         homeScreenLayout.addWidget(button5, 2, 0)
         homeScreenLayout.addWidget(button6, 2, 1)
         homeScreenLayout.addWidget(button7, 2, 2)
         homeScreenLayout.addWidget(button8, 2, 3)
-        homeScreenLayout.addWidget(self.define_label("Vehicle"),3,0)
-        homeScreenLayout.addWidget(self.define_label("Bluetooth"),3,1)
-        homeScreenLayout.addWidget(self.define_label("Messages"),3,2)
-        homeScreenLayout.addWidget(self.define_label("Settings"),3,3)
+        homeScreenLayout.addWidget(self.define_label("Vehicle"), 3, 0)
+        homeScreenLayout.addWidget(self.define_label("Bluetooth"), 3, 1)
+        homeScreenLayout.addWidget(self.define_label("Messages"), 3, 2)
+        homeScreenLayout.addWidget(self.define_label("Settings"), 3, 3)
 
         # Create the radio menu and associated buttons
         radioContainer = QWidget()
@@ -68,10 +72,10 @@ class MainWindow(QMainWindow):
         self.radioLabel = self.define_label("Now listening to:")
         self.radioLabel.setAlignment(Qt.AlignmentFlag.AlignCenter)
         # Define and add radio stations
-        radioButton1 = self.define_button("RTE 1", 200,60,self.change_station, "RTE 1")
-        radioButton2 = self.define_button("RTE 2", 200,60,self.change_station, "RTE 2")
-        radioButton3 = self.define_button("Newstalk", 200,60,self.change_station, "Newstalk")
-        radioButton4 = self.define_button("SPIN SW", 200,60,self.change_station, "SPIN SW")
+        radioButton1 = self.define_button("RTE 1", 200, 60, self.change_station, "RTE 1")
+        radioButton2 = self.define_button("RTE 2", 200, 60, self.change_station, "RTE 2")
+        radioButton3 = self.define_button("Newstalk", 200, 60, self.change_station, "Newstalk")
+        radioButton4 = self.define_button("SPIN SW", 200, 60, self.change_station, "SPIN SW")
         radioList.addWidget(radioButton1)
         radioList.addWidget(radioButton2)
         radioList.addWidget(radioButton3)
@@ -88,7 +92,7 @@ class MainWindow(QMainWindow):
         mapImage.setPixmap(QPixmap("images/mapimage.png"))
         mapMenu.addWidget(mapImage)
         end = QLineEdit()
-        end.setMaximumSize(300,40)
+        end.setMaximumSize(300, 40)
         end.setStyleSheet("width:200px;height:30px;background-color:white;color:black;")
         mapMenu.addWidget(end)
         mapMenu.addWidget(self.define_button("Submit", 160, 40, self.navigate, end))
@@ -113,20 +117,7 @@ class MainWindow(QMainWindow):
         tripMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the phone contacts list
-        phoneContainer = QWidget()
-        phoneMenu = QVBoxLayout(phoneContainer)
-        phoneScroll = QScrollArea()
-        # Add contacts list and place them into scroll menu
-        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan", 
-                         "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
-        for name in self.contacts:
-            phoneMenu.addWidget(self.define_label(name))
-        phoneMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
-        # Set scroll menu rules
-        phoneScroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        phoneScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        phoneScroll.setWidgetResizable(True)
-        phoneScroll.setWidget(phoneContainer)
+        phoneContainer = create_phone_menu(self.change_screen, self.define_button)
 
         # Create the vehicle information screen
         infoContainer = QWidget()
@@ -141,13 +132,13 @@ class MainWindow(QMainWindow):
         carImage = self.define_label("")
         carImage.setStyleSheet("border-width:0px;")
         carImage.setPixmap(QPixmap("images/car.png"))
-        infoMenu.addWidget(infoSidebarContainer,0,0)
-        infoMenu.addWidget(carImage, 0,1)
-        
+        infoMenu.addWidget(infoSidebarContainer, 0, 0)
+        infoMenu.addWidget(carImage, 0, 1)
+
         # Create the bluetooth screen
         bluetoothContainer = QWidget()
         bluetoothMenu = QVBoxLayout(bluetoothContainer)
-        
+
         # 1. Bluetooth Status
         statusGroup = QVBoxLayout()
         statusGroup.addWidget(self.define_label("<b>Bluetooth Status</b>"))
@@ -156,7 +147,7 @@ class MainWindow(QMainWindow):
         self.visibilityLabel = self.define_label("Visible to other devices")
         statusGroup.addWidget(self.visibilityLabel)
         bluetoothMenu.addLayout(statusGroup)
-        
+
         # 2. Paired Devices List
         pairedGroup = QVBoxLayout()
         pairedGroup.addWidget(self.define_label("<b>Paired Devices</b>"))
@@ -164,16 +155,16 @@ class MainWindow(QMainWindow):
         for device in self.pairedDevices:
             deviceLayout = QHBoxLayout()
             deviceLayout.addWidget(self.define_label(device))
-            #a deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
-            #a deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
+            # a deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
+            # a deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
             pairedGroup.addLayout(deviceLayout)
         bluetoothMenu.addLayout(pairedGroup)
-        
+
         # 3. Add New Device / Pair New Device
         pairGroup = QVBoxLayout()
         pairGroup.addWidget(self.define_label("<b>Add New Device</b>"))
         pairGroup.addWidget(self.define_label("Make sure your device is discoverable"))
-        #a pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
+        # a pairGroup.addWidget(self.define_button("Pair New Device", 160, 40, self.pair_new_device, None))
         bluetoothMenu.addLayout(pairGroup)
         bluetoothMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
@@ -181,6 +172,8 @@ class MainWindow(QMainWindow):
         messagesContainer = QWidget()
         messagesMenu = QVBoxLayout(messagesContainer)
         messagesScroll = QScrollArea()
+        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan",
+                         "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
         for name in self.contacts:
             messagesMenu.addWidget(self.define_button(name, 300, 40, self.change_screen, 0))
         messagesMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
@@ -198,18 +191,15 @@ class MainWindow(QMainWindow):
         settingsMenu = QVBoxLayout(settingsContainer)
         # Add some basic settings and attach methods
         self.radioToggle = self.define_button("Radio: On", 160, 40, self.change_station, "")
-        factorySettings = self.define_button("Factory Settings", 160, 40, self.change_screen, 0)
-        systemInfo = self.define_button("System Information", 160, 40, self.change_screen, 0)
-        copyrightButton = self.define_button("Copyright", 160, 40, self.change_screen, 0)
         settingsMenu.addWidget(self.radioToggle)
-        settingsMenu.addWidget(factorySettings)
-        settingsMenu.addWidget(systemInfo)
-        settingsMenu.addWidget(copyrightButton)
+        settingsMenu.addWidget(self.define_button("Factory Settings", 160, 40, self.change_screen, 0))
+        settingsMenu.addWidget(self.define_button("System Information", 160, 40, self.change_screen, 0))
+        settingsMenu.addWidget(self.define_button("Copyright", 160, 40, self.change_screen, 0))
         settingsMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
-    
+
         # Add the different main screens to the stack layout (main window that will change when something happens)
-        self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll, 
-                      infoContainer, bluetoothContainer, messagesScroll, settingsContainer, self.textsContainer]
+        self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneContainer,
+                           infoContainer, bluetoothContainer, messagesScroll, settingsContainer, self.textsContainer]
         for c in self.containers:
             self.stackLayout.addWidget(c)
 
@@ -225,14 +215,14 @@ class MainWindow(QMainWindow):
 
         # Define thread pool to run background threads
         self.threadPool = QThreadPool()
-        # Create and start running the speech to text and trip computer threads 
+        # Create and start running the speech to text and trip computer threads
         speechT = self.speechThread()
         self.tripT = self.tripThread()
         # Instantiate the listener thread and connect its signal
         self.listener = ListenerThread()
         self.listener.speed_received.connect(self.adjust_dimming)
         self.listener.start()  # Begin background listening
-        #aself.threadPool.start(speechT)
+        # aself.threadPool.start(speechT)
         self.threadPool.start(self.tripT)
 
     # Swap screens to specified index
@@ -240,14 +230,14 @@ class MainWindow(QMainWindow):
         self.stackLayout.setCurrentIndex(index)
 
     # Change radio stations
-    def change_station(self,station):
+    def change_station(self, station):
         self.radioLabel.setText("Now listening to: " + station)
         if (self.radioToggle.text() == "Radio: On"):
             self.radioToggle.setText("Radio: Off")
         else:
             self.radioToggle.setText("Radio: On")
 
-    def adjust_dimming(self, speed:int):
+    def adjust_dimming(self, speed: int):
         self.tripT.speed = speed
         if speed < 40:
             alpha = 0
@@ -269,37 +259,29 @@ class MainWindow(QMainWindow):
             disable = True
         for b in self.buttons:
             b.setEnabled(not disable)
-        if disable == True: textColour = "rgb(93,93,93)"
-        else: textColour = "rgb(0,0,0)"
-
+        textColour = "rgb(93,93,93)" if disable else "rgb(0,0,0)"
         # Apply a semi-transparent black overlay
         for container in self.containers:
-            container.setStyleSheet(
-                f"background-color: rgba(0, 0, 0, {alpha});"
-            )
+            container.setStyleSheet(f"background-color: rgba(0, 0, 0, {alpha});")
         for button in self.buttons:
-            button.setStyleSheet(
-                f"background-color: rgba(255,255,255, {alpha}); color:{textColour};"
-            )
+            button.setStyleSheet(f"background-color: rgba(255,255,255, {alpha}); color:{textColour};")
         for label in self.labels:
-            label.setStyleSheet(
-                f"background-color: rgba(255, 255, 255, {alpha});" 
-            )
+            label.setStyleSheet(f"background-color: rgba(255, 255, 255, {alpha});")
 
-    # Create a button with an icon or text field, width, height and connect it to a method 
+    # Create a button with an icon or text field, width, height and connect it to a method
     def define_button(self, iconOrText, w, h, method, methodArg):
         button = QPushButton()
-        if ".png" in iconOrText: 
+        if ".png" in iconOrText:
             button.setIcon(QtGui.QIcon(iconOrText))
-            button.setIconSize(QtCore.QSize(w,h))
+            button.setIconSize(QtCore.QSize(w, h))
         else:
             button.setText(iconOrText)
-        button.setFixedSize(QtCore.QSize(w+2,h+2))
+        button.setFixedSize(QtCore.QSize(w + 2, h + 2))
         button.clicked.connect(lambda: method(methodArg))
         self.buttons.append(button)
         button.setStyleSheet("background-color: rgb(255, 255, 255);")
         return button
-    
+
     # Create a label with a text field. Exists because dimming the screen without redefining background colour for each label will dim them until they are unreadable
     def define_label(self, text):
         label = QLabel(text)
@@ -345,15 +327,16 @@ class MainWindow(QMainWindow):
             range = 500
             while True:
                 time.sleep(1)
-                counter = counter + 1
-                timeTracker  = datetime.fromtimestamp(counter)
+                counter += 1
+                timeTracker = datetime.fromtimestamp(counter)
                 timeString = timeTracker.strftime("%H:%M:%S")
-                tripDistance = tripDistance + ((self.speed / 60 )/ 60)
-                range = range - ((self.speed / 60 )/ 60)
-                window.tripDistanceLabel.setText("Distance travelled: " + str(round(tripDistance,2)) + "km")
-                window.speedLabel.setText("Speed: " + str(self.speed) + "km/h")
-                window.timeLabel.setText("Trip Time: " + timeString)
-                window.rangeLabel.setText("Range: " + str(round(range,2)) + "km")
+                tripDistance += ((self.speed / 60) / 60)
+                range -= ((self.speed / 60) / 60)
+                window.tripDistanceLabel.setText(f"Distance travelled: {round(tripDistance, 2)}km")
+                window.speedLabel.setText(f"Speed: {self.speed}km/h")
+                window.timeLabel.setText(f"Trip Time: {timeString}")
+                window.rangeLabel.setText(f"Range: {round(range, 2)}km")
+
 
 app = QApplication(sys.argv)
 window = MainWindow()
