@@ -1,4 +1,4 @@
-# run pip install pyqt6 SpeechRecognition pyttsx3 PyAudio pycaw screen-brightness-control
+# run pip install pyqt6 SpeechRecognition pyttsx3 PyAudio pycaw screen-brightness-control PyQt6-WebEngine requests
 # press any button to go to its specific screen
 
 from PyQt6.QtWidgets import QApplication, QScrollArea, QMainWindow, QLabel, QVBoxLayout, QHBoxLayout, QWidget, QPushButton, QLineEdit, QGridLayout, QStackedLayout
@@ -9,7 +9,7 @@ from PyQt6.QtWebEngineWidgets import QWebEngineView
 from urllib.parse import quote
 
 
-import speech
+import speech, phone_menu
 from screendimmer import ListenerThread
 import sys, time, webbrowser
 from datetime import datetime
@@ -101,24 +101,9 @@ class MainWindow(QMainWindow):
         tripMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the phone contacts list
-        phoneContainer = QWidget()
-        phoneMenu = QVBoxLayout(phoneContainer)
-        phoneScroll = QScrollArea()
-
-        # for speech
-        self.phoneScroll = phoneScroll
-
-        # Add contacts list and place them into scroll menu
-        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "John", "Landlord", "Lisa", "Monica", "Morgan",
+        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "Landlord", "Lisa", "Monica", "Morgan", 
                          "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
-        for name in self.contacts:
-            phoneMenu.addWidget(self.define_label(name))
-        phoneMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
-        # Set scroll menu rules
-        phoneScroll.setVerticalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOn)
-        phoneScroll.setHorizontalScrollBarPolicy(Qt.ScrollBarPolicy.ScrollBarAlwaysOff)
-        phoneScroll.setWidgetResizable(True)
-        phoneScroll.setWidget(phoneContainer)
+        self.phoneScroll = phone_menu.create_phone_menu(self.change_screen, self.define_button)
 
         # Create the vehicle information screen
         infoContainer = QWidget()
@@ -210,6 +195,7 @@ class MainWindow(QMainWindow):
         settingsMenu.addWidget(factorySettings)
         settingsMenu.addWidget(systemInfo)
         settingsMenu.addWidget(copyrightButton)
+        settingsMenu.addWidget(self.define_button("Close program", 160, 40, self.exit_program, 0))
         settingsMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
         # Create the languages screen
@@ -227,7 +213,7 @@ class MainWindow(QMainWindow):
         informationMenu = QVBoxLayout(informationContainer)
         informationText = self.define_label("How to use:\nAfter running this program, run speedtest.py.\nInteract with this menu" \
         ", ideally with the touchscreen.\nYou may also say 'Hey Jaguar' to use the voice control system.\nUse the slider included in speedtest.py" \
-        "to adjust the simulated speed.\nFor safety, the GUI will not be interactable past 60km/h." \
+        " to adjust the simulated speed.\nFor safety, the GUI will not be interactable past 60km/h." \
         "\nUse the voice control system past this point.")
         informationMenu.setAlignment(Qt.AlignmentFlag.AlignCenter)
         informationMenu.addWidget(informationText)
@@ -244,7 +230,7 @@ class MainWindow(QMainWindow):
         copyrightScreen.addWidget(self.define_button("Back", 160, 40, self.change_screen, 8))
 
         # Add the different main screens to the stack layout (main window that will change when something happens)
-        self.containers = [container, radioGridContainer, mapContainer, tripContainer, phoneScroll,
+        self.containers = [container, radioGridContainer, mapContainer, tripContainer, self.phoneScroll,
                       infoContainer, bluetoothContainer, messageContainer, settingsContainer, self.textsContainer,
                       languageContainer, informationContainer, copyrightContainer]
         for c in self.containers:
@@ -283,9 +269,11 @@ class MainWindow(QMainWindow):
         self.listener = ListenerThread()
         self.listener.speed_received.connect(self.adjust_dimming)
         self.listener.start()  # Begin background listening
+        self.threadPool.start(self.tripT)
 
-        #aself.threadPool.start(self.tripT)
-
+    # Exits the program. Crashes it at the moment, using exit() just freezes it
+    def exit_program(self, device):
+        self.exitProgramLabel.setText(f"Connected to: {device}")
     # Swap screens to specified index
     def change_screen(self, index):
         self.current_screen = index
@@ -306,24 +294,24 @@ class MainWindow(QMainWindow):
             alpha = 0
             disable = False
         elif speed < 60:
-            alpha = 60
+            alpha = 30
             disable = False
         elif speed < 80:
-            alpha = 100
+            alpha = 50
             disable = True
         elif speed < 100:
-            alpha = 140
+            alpha = 70
             disable = True
         elif speed < 120:
-            alpha = 180
+            alpha = 90
             disable = True
         else:
-            alpha = 215
+            alpha = 110
             disable = True
         for b in self.buttons:
             b.setEnabled(not disable)
-        if disable == True: textColour = "rgb(93,93,93)"
-        else: textColour = "rgb(0,0,0)"
+        if disable == True: textColour = 93
+        else: textColour = 255
 
         # Apply a semi-transparent black overlay
         for container in self.containers:
@@ -332,11 +320,11 @@ class MainWindow(QMainWindow):
             )
         for button in self.buttons:
             button.setStyleSheet(
-                f"background-color: rgba(255,255,255, {alpha}); color:{textColour};"
+                f"background-color: rgba({textColour}, {textColour}, {textColour}, {alpha});"
             )
         for label in self.labels:
             label.setStyleSheet(
-                f"background-color: rgba(255, 255, 255, {alpha});"
+                f"background-color: rgba(0, 0, 0, {alpha});" 
             )
 
     # Get messages from the messages file for the specific contact and display them
