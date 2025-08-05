@@ -3,17 +3,18 @@ from PyQt6.QtCore import QObject, pyqtSignal, QRunnable, pyqtSlot
 import threading
 import speech_recognition as sr
 import pyttsx3 # text to speech
-import re
+import re # regular expressions (regex)
 import screen_brightness_control as sbc #system brightness
-from ctypes import cast, POINTER
-from comtypes import CLSCTX_ALL
+from ctypes import cast, POINTER # cast COM for pycaw  && access COM object members
+from comtypes import CLSCTX_ALL # access everything in COM object
 from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume # system volume
-from urllib.parse import quote
+from urllib.parse import quote # quotation mark for url-safe string
 import requests # for Google Maps API
 
-# Google API key
+# Google API key (currently using personal gmail)
 GOOGLE_MAPS_API_KEY = "AIzaSyDM4IvsH8I3YMgcQE_xyus6XxGZ3ZjTp9Y"
 
+# read out travel distance && time required
 def get_travel_info(destination):
     base_url = "https://maps.googleapis.com/maps/api/directions/json"
     params = {
@@ -67,6 +68,7 @@ class speechThread(QRunnable):
         # keywords for changing screens
         self.screen_commands = {
             ("open radio", "go to radio"): (1, "Opening Radio Screen."),
+            ("open maps", "go to maps"): (2, "Opening Navigation Screen."),
             ("open trip computer", "go to trip"): (3, "Opening Trip Computer Screen."),
             ("open phone", "go to phone"): (4, "Opening Phone Screen."),
             ("open vehicle", "go to vehicle", "vehicle info"): (5, "Opening Vehicle Info Screen."),
@@ -117,6 +119,7 @@ class speechThread(QRunnable):
                 print("Error:", e)
                 return ""
            
+    # cancel navigation
     def is_cancel_command(self, text):
         # cancel
         cancel_keywords = ["go back", "cancel", "stop navigation", "stop navigate", "never mind", "nevermind", "exit", "back"]
@@ -164,6 +167,7 @@ class speechThread(QRunnable):
                         if any(keyword in text for keyword in keywords):
                             self.signals.change_station.emit(station_name)
                             self.speak(response)
+                            self.awake = False
                             continue
 
                     # return to sleep mode
@@ -174,16 +178,19 @@ class speechThread(QRunnable):
                         
                     if "thank you" in text:
                         self.speak("You are welcome.")
+                        self.awake = False
                         continue
                     
                     # toggling bluetooth
                     if "turn on bluetooth" in text:
                         self.signals.toggle_bluetooth.emit(True)
                         self.speak("Turning on Bluetooth.")
+                        self.awake = False
                         continue
                     elif "turn off bluetooth" in text:
                         self.signals.toggle_bluetooth.emit(False)
                         self.speak("Turning off Bluetooth.")
+                        self.awake = False
                         continue
 
                     # toggling radio
@@ -194,6 +201,7 @@ class speechThread(QRunnable):
                     elif "turn off radio" in text:
                         self.signals.toggle_radio.emit(False)
                         self.speak("Turning off radio.")
+                        self.awake = False
                         continue
 
                     # set volume
@@ -218,6 +226,7 @@ class speechThread(QRunnable):
                             else:
                                 self.set_volume(int(current - 10))
                                 self.speak("Volume decreased.")
+                        self.awake = False
                         continue
 
                     # set brightness
@@ -234,17 +243,18 @@ class speechThread(QRunnable):
                             if match:
                                 sbc.set_brightness(int(match.group(1)))
                                 self.speak("Brightness set.")
+                        self.awake = False
                         continue
 
                     # navigation commands
-                    if any(kw in text for kw in ["open maps", "navigate", "open navigation", "bring me to"]):
+                    if any(kw in text for kw in ["navigate", "open navigation", "bring me to"]):
                         self.signals.change_screen.emit(2)
                     
                         destination = None
                         if "bring me to" in text:
                             destination = text.split("bring me to", 1)[1].strip()
                         else:
-                            for _ in range(3):
+                            for _ in range(3): # 3 times before auto cancel
                                 self.speak("Where are you going?")
                                 response = self.listen(timeout=5, phrase_time_limit=10)
                     
@@ -263,8 +273,9 @@ class speechThread(QRunnable):
                             else:
                                 self.speak("Failed to get a valid destination, cancelling.")
                                 self.awake = False
-                                continue  # Go to next loop iteration
+                                continue
                     
+                        # actual destination is given
                         if destination and not self.is_cancel_command(destination):
                             start = "Jaguar Land Rover Shannon"
                             dest_encoded = quote(destination)
@@ -279,7 +290,7 @@ class speechThread(QRunnable):
                             else:
                                 self.speak("I couldn't retrieve travel information.")
                         
-                        continue  # Important to avoid falling through to "Command not recognized"
+                        continue 
 
                     # scrolling function
                     if "scroll down" in text:

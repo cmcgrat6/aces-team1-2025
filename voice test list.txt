@@ -1,0 +1,33 @@
+*********** Test List (for voice commands) ******************
+pre-conditions: "Hi Jaguar"
+
+From Anywhere:
+1) "open/go to (radio/maps/trip computer/phone/vehicle/bluetooth/message/settings)"
+2) "turn on/off radio/bluetooth"
+3) "increase/decrease brightness/volume" (+- 10)		OR		"set brightness/volume to {value}"
+4) "go back/go home/return to main"		(back to main screen)
+5) "go to sleep/thank you"		(command goes to sleep)
+
+About Radio:
+1) "switch to (RTE 1/RTE 2/News Talk/Spin Southwest)"
+
+About Navigation:
+1) "open navigation/navigate"
+2) say "{destination}" 
+3) if destination is (go back/cancel/stop navigation/stop navigate/never mind/nevermind/exit/back)
+	cancel navigation but maps is kept open
+
+		OR
+
+1) "bring me to {destination}"
+
+About Phone & Messages:
+1) "scroll up/down"
+
+About Messages:
+1) "open chat with {name}"
+2) "read messages from {name}"
+
+****************** Side Notes *******************
+for now my gmail account is used to take API key for maps voice.
+toggle on off voice commands in settings?
