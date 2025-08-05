@@ -6,6 +6,7 @@ from PyQt6 import QtGui, QtCore
 from PyQt6.QtCore import QRunnable, pyqtSlot, QThreadPool, Qt
 from PyQt6.QtGui import QPixmap
 
+import speech
 #aimport speech
 from screendimmer import ListenerThread
 import sys, time, webbrowser
@@ -317,7 +318,8 @@ class MainWindow(QMainWindow):
 
     # Open Google Maps with the specified start and end destinations (temp)
     def navigate(self, end):
-        url = f"https://www.google.com/maps/dir/{"V14 T863"}/{end.text()}"
+        start = "V14 T863"
+        url = f"https://www.google.com/maps/dir/{start}/{end.text()}"
         webbrowser.open(url)
 
     # Thread class to run the speech recognition in the background
