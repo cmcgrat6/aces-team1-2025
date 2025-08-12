@@ -4,9 +4,7 @@
     <option name="autoReloadType" value="SELECTIVE" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c3fcbe75-68fb-4501-8290-0aacba92cb1b" name="Changes" comment="ide">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-    </list>
+    <list default="true" id="c3fcbe75-68fb-4501-8290-0aacba92cb1b" name="Changes" comment="ide" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -79,7 +77,6 @@
     &quot;Python.phone_menu.executor&quot;: &quot;Run&quot;,
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;shane-gui&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/seaso/OneDrive - JLR/Desktop/aces-team1-2025&quot;,
     &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
     &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
@@ -98,7 +95,7 @@
       <recent name="C:\Users\seaso\OneDrive - JLR\Desktop\aces-team1-2025" />
     </key>
   </component>
-  <component name="RunManager" selected="Python.phone_menu">
+  <component name="RunManager" selected="Python.gui">
     <configuration name="gui-example" type="PythonConfigurationType" factoryName="Python" temporary="true" nameIsGenerated="true">
       <module name="aces-team1-2025" />
       <option name="ENV_FILES" value="" />
@@ -168,15 +165,6 @@
       <option name="INPUT_FILE" value="" />
       <method v="2" />
     </configuration>
-    <recent_temporary>
-      <list>
-        <item itemvalue="Python.phone_menu" />
-        <item itemvalue="Python.gui" />
-        <item itemvalue="Python.gui-example" />
-        <item itemvalue="Python.gui-example" />
-        <item itemvalue="Python.gui" />
-      </list>
-    </recent_temporary>
   </component>
   <component name="SharedIndexes">
     <attachedChunks>
@@ -195,6 +183,8 @@
       <updated>1752672492593</updated>
       <workItem from="1752672493755" duration="1239000" />
       <workItem from="1752678564346" duration="31866000" />
+      <workItem from="1754909084032" duration="204000" />
+      <workItem from="1755008933644" duration="10000" />
     </task>
     <task id="LOCAL-00001" summary="unversioned files .idea">
       <option name="closed" value="true" />
