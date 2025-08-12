@@ -305,11 +305,8 @@ class MainWindow(QMainWindow):
         elif speed < 100:
             alpha = 70
             disable = True
-        elif speed < 120:
-            alpha = 90
-            disable = True
         else:
-            alpha = 110
+            alpha = 90
             disable = True
         for b in self.buttons:
             b.setEnabled(not disable)
