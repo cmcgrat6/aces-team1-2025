@@ -100,9 +100,7 @@ class MainWindow(QMainWindow):
         tripMenu.addWidget(self.rangeLabel)
         tripMenu.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
 
-        # Create the phone contacts list
-        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "Landlord", "Lisa", "Monica", "Morgan", 
-                         "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
+        # Create the phone menu
         self.phoneScroll = phone_menu.create_phone_menu(self.change_screen, self.define_button)
 
         # Create the vehicle information screen
@@ -115,11 +113,11 @@ class MainWindow(QMainWindow):
         infoSidebar.addWidget(self.define_label("Temperature: 47°C"))
         infoSidebar.addWidget(self.define_label("No driver seatbelt"))
         infoSidebar.addWidget(self.define_button("Back", 160, 40, self.change_screen, 0))
-        carImage = self.define_label("")
-        carImage.setStyleSheet("border-width:0px;")
-        carImage.setPixmap(QPixmap("images/car.png"))
+        self.carImage = self.define_label("")
+        self.carImage.setStyleSheet("border-width:0px;")
+        self.carImage.setPixmap(QPixmap("images/car.png"))
         infoMenu.addWidget(infoSidebarContainer,0,0)
-        infoMenu.addWidget(carImage, 0,1)
+        infoMenu.addWidget(self.carImage, 0,1)
 
         # Create the bluetooth screen
         bluetoothContainer = QWidget()
@@ -137,10 +135,13 @@ class MainWindow(QMainWindow):
         # 2. Paired Devices List
         pairedGroup = QVBoxLayout()
         pairedGroup.addWidget(self.define_label("<b>Paired Devices</b>"))
-        self.pairedDevices = ["Amy's Phone", "Car Audio", "John's Tablet"]
-        for device in self.pairedDevices:
+        self.amyPhone = self.define_label("Amy's Phone")
+        self.carAudio = self.define_label("Car Audio")
+        self.johnTablet = self.define_label("John's Tablet")
+        pairedDevices = [self.amyPhone, self.carAudio, self.johnTablet]
+        for device in pairedDevices:
             deviceLayout = QHBoxLayout()
-            deviceLayout.addWidget(self.define_label(device))
+            deviceLayout.addWidget(device)
             deviceLayout.addWidget(self.define_button("Connect", 80, 30, self.connect_device, device))
             deviceLayout.addWidget(self.define_button("Remove", 80, 30, self.remove_device, device))
             pairedGroup.addLayout(deviceLayout)
@@ -167,6 +168,8 @@ class MainWindow(QMainWindow):
         self.messagesScroll = messagesScroll
         
         # Add all of the contacts to the scroll area
+        self.contacts = ["Amy", "Caitlin", "Dave work", "Home", "John", "Landlord", "Lisa", "Monica", "Morgan", 
+                         "Paul", "Pizza", "Sean", "Sylvester do not answer", "Tyrell"]
         for name in self.contacts:
             messagesMenu.addWidget(self.define_button(name, 800, 50, self.open_messages, name))
         # Set the scroll area rules and add each widget to the correct place
@@ -190,7 +193,7 @@ class MainWindow(QMainWindow):
         self.radioToggle = self.define_button("Radio: On", 160, 40, self.change_station, "Radio Off")
         factorySettings = self.define_button("Language", 160, 40, self.change_screen, 10)
         systemInfo = self.define_button("System Information", 160, 40, self.change_screen, 11)
-        copyrightButton = self.define_button("Copyright", 160, 40, self.change_screen, 12)
+        copyrightButton = self.define_button("Credits", 160, 40, self.change_screen, 12)
         settingsMenu.addWidget(self.radioToggle)
         settingsMenu.addWidget(factorySettings)
         settingsMenu.addWidget(systemInfo)
@@ -313,6 +316,10 @@ class MainWindow(QMainWindow):
         if disable == True: textColour = 93
         else: textColour = 255
 
+        if speed > 39:
+            self.carImage.setPixmap(QPixmap("images/darkcar.png"))
+        else:
+            self.carImage.setPixmap(QPixmap("images/car.png"))
         # Apply a semi-transparent black overlay
         for container in self.containers:
             container.setStyleSheet(
@@ -408,16 +415,17 @@ class MainWindow(QMainWindow):
             self.visibilityLabel.setText("Visible to other devices")
 
     def connect_device(self, device):
-        self.activeDeviceLabel.setText(f"Connected to: {device}")
-        self.signalLabel.setText("Signal: Good")
-        self.batteryLabel.setText("Battery: 85%")
-        self.errorLabel.setText("")
+        text = device.text()
+        if (not text.endswith(": Connected")):
+            device.setText(text + ": Connected")
 
     def remove_device(self, device):
-        self.errorLabel.setText(f"{device} removed from paired devices.")
+        text = device.text()
+        if (text.endswith(": Connected")):
+            device.setText(text[:-11])
 
     def pair_new_device(self, _):
-        self.errorLabel.setText("Pairing failed: Device not found.")
+        b = 5
 
     # open maps
     def load_map(self, url: str):
