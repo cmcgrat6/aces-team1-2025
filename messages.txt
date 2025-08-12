@@ -1,7 +1,15 @@
-Amy From: Message example
-Amy To: Another message example
-John From: From John
-John To: To John
-John From: Text
-Landlord From: Landlord
-Caitlin From: J
+Amy From: Get milk on the way home
+Amy From: Did you see my message?
+Amy To: I did indeed, thanks to my car's built-in text message reader
+Dave work From: We need you in on Saturday
+Dave work To: Are you serious
+Dave work From: Sylvester just quit, we don't have anyone staffed
+Landlord From: Rent is up 300 this month
+Landlord To: :(
+Caitlin To: Landlord raised my rent again
+Caitlin To: What do I do?
+Caitlin From: Idk
+Pizza From: Pizza's here
+Pizza From: Pizza's here
+Pizza From: Pizza's here
+Pizza From: Pizza's here
